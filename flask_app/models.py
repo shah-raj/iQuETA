@@ -96,3 +96,8 @@ class Marks(db.Model):
     date_of_attempt = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     def __repr__(self):
         return f"Question('{self.student_id}' - '{self.test_id}' - '{self.score}')"
+
+# db.create_all()
+# t1 = Teacher(username="ran",name="Rohini Nair",email="ran@somaiya.edu",password="password")
+# db.session.add(t1)
+# db.session.commiit()
