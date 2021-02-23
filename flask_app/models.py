@@ -14,7 +14,6 @@ def load_user(user_id):
 
 class Teacher(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
     name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
@@ -35,11 +34,10 @@ class Teacher(db.Model, UserMixin):
         return Teacher.query.get(user_id)
 
     def __repr__(self):
-        return f"Teacher('{self.username}', '{self.email}', '{self.image_file}')"
+        return f"Teacher('{self.username}', '{self.email}')"
 
 class Student(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
     name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
@@ -60,7 +58,7 @@ class Student(db.Model, UserMixin):
         return Student.query.get(user_id)
 
     def __repr__(self):
-        return f"Student('{self.username}', '{self.email}', '{self.image_file}')"
+        return f"Student('{self.username}', '{self.email}')"
 
 
 class Test(db.Model):

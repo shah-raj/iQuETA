@@ -13,6 +13,7 @@ from decouple import config as conf
 app = Flask(__name__)
 app.config['SECRET_KEY'] = conf('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
@@ -42,5 +43,18 @@ access_token_method='POST',
 access_token_params={'grant_type': 'authorization_code'},
 consumer_key=GOOGLE_CLIENT_ID,
 consumer_secret=GOOGLE_CLIENT_SECRET)
+
+class userType:
+    def __init__(self,type=None):
+        self._type = type
+    
+    def get_type(self):
+        return self._type
+    
+    def setTypeToTeacher(self):
+        self._type = "teacher"
+    
+    def setTypeToStudent(self):
+        self._type = "student"
 
 from flask_app import routes
