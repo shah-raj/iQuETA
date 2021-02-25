@@ -34,7 +34,7 @@ class Teacher(db.Model, UserMixin):
         return Teacher.query.get(user_id)
 
     def __repr__(self):
-        return f"Teacher('{self.username}', '{self.email}')"
+        return f"Teacher('{self.name}', '{self.email}')"
 
 class Student(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -58,7 +58,7 @@ class Student(db.Model, UserMixin):
         return Student.query.get(user_id)
 
     def __repr__(self):
-        return f"Student('{self.username}', '{self.email}')"
+        return f"Student('{self.name}', '{self.email}')"
 
 
 class Test(db.Model):

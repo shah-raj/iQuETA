@@ -1,8 +1,7 @@
-import os
-import secrets
+import os, secrets, json ,sys
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort, jsonify, Flask, session
-from flask_app import app, db, bcrypt, mail, google, REDIRECT_URI
+from flask_app import app, db, bcrypt, mail, google, REDIRECT_URI, currentUserType
 from flask_app.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                              RequestResetForm, ResetPasswordForm)
 from flask_app.models import Teacher, Student
@@ -10,12 +9,14 @@ from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 from urllib.request import Request, urlopen, URLError
 from urllib.parse import urlparse
-import json
 
 @app.route("/")
 @app.route("/home", methods=['GET', 'POST'])
 def home():
-    return render_template('home.html')
+    if current_user.is_authenticated:
+        return render_template('home.html',currentUserType = currentUserType)
+    else:
+        return render_template('home.html')
 
 @app.route("/about")
 def about():
@@ -28,13 +29,31 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = Teacher(name=form.name.data, email=form.email.data, password=hashed_password)
+        form.user_type.choices = [(i,j) for i,j in RegistrationForm.choices]
+        if form.user_type.data == 'Student':
+            user = Student(name=form.name.data, email=form.email.data, password=hashed_password)
+            currentUserType.setTypeToStudent()
+        else:
+            user = Teacher(name=form.name.data, email=form.email.data, password=hashed_password)
+            currentUserType.setTypeToTeacher()
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
-        return redirect(url_for('login'))
+        if currentUserType.isStudent():
+            return redirect(url_for('login'))
+        else:
+            return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
+@app.route("/slogin")
+def slogin():
+    currentUserType.setTypeToStudent()
+    return redirect(url_for('login'))
+
+@app.route("/tlogin")
+def tlogin():
+    currentUserType.setTypeToTeacher()
+    return redirect(url_for('login'))
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -59,7 +78,6 @@ def login():
                 return redirect(url_for('googleLogin'))
             res.read()
             
-
         output = res.read().decode('utf-8')
         json_obj = json.loads(output)
         user = Teacher.query.filter_by(email=json_obj['email']).first()
@@ -68,7 +86,12 @@ def login():
         return redirect(next_page) if next_page else redirect(url_for('home'))
 
     if form.validate_on_submit():
-        user = Teacher.query.filter_by(email=form.email.data).first()
+        if currentUserType.isStudent():
+            user = Student.query.filter_by(email=form.email.data).first()
+            currentUserType.setTypeToStudent()
+        else:
+            user = Teacher.query.filter_by(email=form.email.data).first()
+            currentUserType.setTypeToTeacher()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')

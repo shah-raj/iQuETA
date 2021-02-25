@@ -35,6 +35,11 @@
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
               {% if current_user.is_authenticated %}
+                {% if currentUserType.isStudent() %}
+                  <a class="nav-item nav-link" href="#"> Enter Test Code</a>
+                {% else %}
+                  <a class="nav-item nav-link" href="#"> Create New Test</a>
+                {% endif %}
                 <a class="nav-item nav-link" href="{{ url_for('account') }}"> {{current_user.name}}'s Account</a>
                 <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
               {% else %}

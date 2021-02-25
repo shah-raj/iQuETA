@@ -56,5 +56,16 @@ class userType:
     
     def setTypeToStudent(self):
         self._type = "student"
+    
+    def isStudent(self):
+        if self._type == "student":
+            return True
+        return False
+    
+    def isTeacher(self):
+        if self._type == "teacher":
+            return True
+        return False
 
+currentUserType = userType()
 from flask_app import routes

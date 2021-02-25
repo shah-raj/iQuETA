@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, Form
+from wtforms import (StringField, PasswordField, SubmitField, 
+                    BooleanField, TextAreaField, Form, SelectField)
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_app.models import Teacher, Student
 
@@ -10,6 +11,8 @@ class RegistrationForm(FlaskForm):
                            validators=[DataRequired(), Length(min=2, max=50)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
+    choices = [('Student','Student'),('Teacher','Teacher')]
+    user_type = SelectField('Select user type', choices=choices,validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()],id='register_password')
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')],id='confirm_password')
