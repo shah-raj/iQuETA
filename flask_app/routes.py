@@ -13,14 +13,15 @@ from urllib.parse import urlparse
 @app.route("/")
 @app.route("/home", methods=['GET', 'POST'])
 def home():
+    print(currentUserType.isStudent(),file=sys.stderr)
     if current_user.is_authenticated:
-        return render_template('home.html',currentUserType = currentUserType)
+        return render_template('about.html',currentUserType = currentUserType)
     else:
-        return render_template('home.html')
+        return render_template('home.html',currentUserType = currentUserType)
 
 @app.route("/about")
 def about():
-    return render_template('about.html', title='About')
+    return render_template('about.html', title='About',currentUserType = currentUserType)
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -29,13 +30,12 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        form.user_type.choices = [(i,j) for i,j in RegistrationForm.choices]
-        if form.user_type.data == 'Student':
+        # form.user_type.choices = [(i,j) for i,j in RegistrationForm.choices]
+        # if form.user_type.data == 'Student':
+        if currentUserType.isStudent():
             user = Student(name=form.name.data, email=form.email.data, password=hashed_password)
-            currentUserType.setTypeToStudent()
         else:
             user = Teacher(name=form.name.data, email=form.email.data, password=hashed_password)
-            currentUserType.setTypeToTeacher()
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
@@ -43,7 +43,7 @@ def register():
             return redirect(url_for('login'))
         else:
             return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form)
+    return render_template('register.html', title='Register', form=form,currentUserType = currentUserType)
 
 @app.route("/slogin")
 def slogin():
@@ -80,7 +80,10 @@ def login():
             
         output = res.read().decode('utf-8')
         json_obj = json.loads(output)
-        user = Teacher.query.filter_by(email=json_obj['email']).first()
+        if currentUserType.isStudent():
+            user = Student.query.filter_by(email=json_obj['email']).first()
+        else:
+            user = Teacher.query.filter_by(email=json_obj['email']).first()
         login_user(user, remember=form.remember.data)
         next_page = request.args.get('next')
         return redirect(next_page) if next_page else redirect(url_for('home'))
@@ -91,14 +94,16 @@ def login():
             currentUserType.setTypeToStudent()
         else:
             user = Teacher.query.filter_by(email=form.email.data).first()
-            currentUserType.setTypeToTeacher()
+            currentUserType.setTypeToTeacher()   
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
+            user.authenticated = True
+            print(current_user,file=sys.stderr)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
-    return render_template('login.html', title='Login', form=form)
+    return render_template('login.html', title='Login', form=form,currentUserType = currentUserType)
 
 @app.route('/googleLogin')
 def googleLogin():
@@ -157,7 +162,7 @@ def account():
         form.email.data = current_user.email
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template('account.html', title='Account',
-                           image_file=image_file, form=form)
+                           image_file=image_file, form=form,currentUserType = currentUserType)
 
 def send_reset_email(user):
     token = user.get_reset_token()
@@ -178,18 +183,24 @@ def reset_request():
         return redirect(url_for('home'))
     form = RequestResetForm()
     if form.validate_on_submit():
-        user = Teacher.query.filter_by(email=form.email.data).first()
+        if currentUserType.isStudent():
+            user = Student.query.filter_by(email=form.email.data).first()
+        else:
+            user = Teacher.query.filter_by(email=form.email.data).first()
         send_reset_email(user)
         flash('An email has been sent with instructions to reset your password.', 'info')
         return redirect(url_for('login'))
-    return render_template('reset_request.html', title='Reset Password', form=form)
+    return render_template('reset_request.html', title='Reset Password', form=form, currentUserType = currentUserType)
 
 
 @app.route("/reset_password/<token>", methods=['GET', 'POST'])
 def reset_token(token):
     if current_user.is_authenticated:
         return redirect(url_for('home'))
-    user = Teacher.verify_reset_token(token)
+    if currentUserType.isStudent():
+        user = Student.verify_reset_token(token)
+    else:
+        user = Teacher.verify_reset_token(token)
     if user is None:
         flash('That is an invalid or expired token', 'warning')
         return redirect(url_for('reset_request'))
@@ -200,4 +211,4 @@ def reset_token(token):
         db.session.commit()
         flash('Your password has been updated! You are now able to log in', 'success')
         return redirect(url_for('login'))
-    return render_template('reset_token.html', title='Reset Password', form=form)
+    return render_template('reset_token.html', title='Reset Password', form=form,currentUserType = currentUserType)

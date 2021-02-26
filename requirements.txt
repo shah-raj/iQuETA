@@ -1,0 +1,10 @@
+flask
+flask_sqlalchemy
+flask_bcrypt
+flask_mail
+flask_login	
+flask_wtf
+wtforms
+Pillow
+python-decouple	
+git+https://github.com/mitsuhiko/flask-oauth

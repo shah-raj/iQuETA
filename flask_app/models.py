@@ -1,14 +1,14 @@
 from datetime import datetime
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask_app import db, login_manager, app
+from flask_app import db, login_manager, app, currentUserType
 from flask_login import UserMixin
 
 
 @login_manager.user_loader
 def load_user(user_id):
-    try:
+    if currentUserType.isTeacher():
         return Teacher.query.get(int(user_id))
-    except:
+    else:
         return Student.query.get(int(user_id))
 
 

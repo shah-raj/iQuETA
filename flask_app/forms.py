@@ -11,8 +11,8 @@ class RegistrationForm(FlaskForm):
                            validators=[DataRequired(), Length(min=2, max=50)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
-    choices = [('Student','Student'),('Teacher','Teacher')]
-    user_type = SelectField('Select user type', choices=choices,validators=[DataRequired()])
+    # choices = [('Student','Student'),('Teacher','Teacher')]
+    # user_type = SelectField('Select user type', choices=choices,validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()],id='register_password')
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')],id='confirm_password')
@@ -65,7 +65,3 @@ class ResetPasswordForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
-
-class UserTypeForm(FlaskForm):
-    teacher = SubmitField('Teacher')
-    student = SubmitField('Student')
