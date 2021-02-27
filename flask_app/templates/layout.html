@@ -49,7 +49,7 @@
             <div class="navbar-nav">
               {% if current_user.is_authenticated %}
                 {% if currentUserType.isStudent() %}
-                  <a class="nav-item nav-link" href="#"> Enter Test Code</a>
+                  <a class="nav-item nav-link" href="{{url_for('code')}}"> Enter Test Code</a>
                 {% else %}
                   <a class="nav-item nav-link" href="{{ url_for('create_test') }}"> Create New Test</a>
                 {% endif %}

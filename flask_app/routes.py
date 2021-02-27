@@ -4,7 +4,7 @@ from flask import render_template, url_for, flash, redirect, request, abort, jso
 from flask_app import app, db, bcrypt, mail, google, REDIRECT_URI, currentUserType
 from flask_app.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                              RequestResetForm, ResetPasswordForm)
-from flask_app.models import Teacher, Student
+from flask_app.models import Teacher, Student, Questions, Test, Marks
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 from urllib.request import Request, urlopen, URLError
@@ -22,7 +22,7 @@ global_answers=list()
 @app.route("/")
 @app.route("/home", methods=['GET', 'POST'])
 def home():
-    print(currentUserType.isStudent(),file=sys.stderr)
+    # print(currentUserType.isStudent(),file=sys.stderr)
     if current_user.is_authenticated:
         return render_template('about.html',currentUserType = currentUserType)
     else:
@@ -31,6 +31,16 @@ def home():
 @app.route("/about")
 def about():
     return render_template('about.html', title='About',currentUserType = currentUserType)
+
+
+
+
+
+
+
+
+
+
 
 
 @app.route("/create_test")
@@ -112,7 +122,7 @@ def login():
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             user.authenticated = True
-            print(current_user,file=sys.stderr)
+            # print(current_user,file=sys.stderr)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
@@ -227,12 +237,17 @@ def reset_token(token):
         return redirect(url_for('login'))
     return render_template('reset_token.html', title='Reset Password', form=form,currentUserType = currentUserType)
 
+@app.route("/code",methods=['POST', 'GET'])
+def code():
+    if request.method=='POST':
+        c = request.form['code']
+        t = Test.query.filter_by(code=c).first()
+        return redirect(url_for("test",testId=t.id))
+    return render_template('code.html', title='Code',currentUserType = currentUserType)
 
 
 @app.route("/generate_test", methods=["GET", "POST"])
 def generate_test():
-
-
     file = request.files["file"]
     session["filepath"] = secure_filename(file.filename)
     file.save(secure_filename(file.filename))
@@ -241,13 +256,10 @@ def generate_test():
         session["subject"] = request.form['subject']
     else:
         session["subject"] = request.args.get['subject']
-    print(session["filepath"])
+    # print(session["filepath"])
 
     codd=''.join(random.choice(string.ascii_uppercase + string.ascii_uppercase + string.digits) for _ in range(8))
 
-    # today=date.today()
-    # date_form=''
-    # date_form=str(today.day)+'/'+ str(today.month)+'/'+ str(today.year)
     testt=Test(subject=session["subject"],date_created=date.today(),teacher_id=current_user.id,code=codd,status=1,max_score=10)
     db.session.add(testt)
     db.session.commit()
@@ -268,20 +280,19 @@ def generate_test():
         question2=question_list[1],
         question3=question_list[2]
     )
-    # elif session["test_id"] == "1":
-    #     # Generate subjective test
-    #     subjective_generator = SubjectiveTest(session["filepath"])
-    #     question_list, answer_list = subjective_generator.generate_test(num_of_questions=2)
-    #     for ans in answer_list:
-    #         global_answers.append(ans)
-        
-    #     return render_template(
-    #         "subjective_test.html",
-    #         username=session["username"],
-    #         testname=session["subject_name"],
-    #         question1=question_list[0],
-    #         question2=question_list[1]
-    #     )
-    # else:
-    #     print("Done!")
-    #     return None
+    
+
+@app.route("/test/<int:testId>", methods=['POST', 'GET'])
+def test(testId):
+    questions = Questions.query.filter_by(test_id=testId).all()
+    if request.method == 'GET':
+        return render_template("test.html", data=questions, currentUserType=currentUserType)
+    else:
+        result = 0
+        total = 0
+        for q in questions:
+            selected = str(q.id)
+            if request.form[selected] == str(q.ans):
+                result += 1
+            total += 1
+        return render_template('results.html', total=total, result=result, currentUserType=currentUserType)

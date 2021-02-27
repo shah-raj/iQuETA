@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+    <form method="post">
+        {% for question in data %}
+            <h2>{{ question.question_text }}</h2>
+
+            <input type="radio" id="{{ question.op1 }}" name="{{ question.id }}" value="{{ question.op1 }}"> {{ question.op1 }}<br>
+            <input type="radio" id="{{ question.op2 }}" name="{{ question.id }}" value="{{ question.op2 }}"> {{ question.op2 }}<br>
+            <input type="radio" id="{{ question.op3 }}" name="{{ question.id }}" value="{{ question.op3 }}"> {{ question.op3 }}<br>
+            <input type="radio" id="{{ question.op4 }}" name="{{ question.id }}" value="{{ question.op4 }}"> {{ question.op4 }}<br>
+        {% endfor %}
+        <br>
+        <input type="submit" value="Submit" name="Submit"/>
+    </form>
+{% endblock content %}
