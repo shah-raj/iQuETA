@@ -9,6 +9,15 @@ from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 from urllib.request import Request, urlopen, URLError
 from urllib.parse import urlparse
+from werkzeug.utils import secure_filename
+from flask_app.objective import ObjectiveTest
+import random
+from datetime import date
+
+import string
+from flask_app.models import Test
+
+global_answers=list()
 
 @app.route("/")
 @app.route("/home", methods=['GET', 'POST'])
@@ -22,6 +31,11 @@ def home():
 @app.route("/about")
 def about():
     return render_template('about.html', title='About',currentUserType = currentUserType)
+
+
+@app.route("/create_test")
+def create_test():
+    return render_template('create_test.html', title='Create_test',currentUserType = currentUserType)
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -212,3 +226,62 @@ def reset_token(token):
         flash('Your password has been updated! You are now able to log in', 'success')
         return redirect(url_for('login'))
     return render_template('reset_token.html', title='Reset Password', form=form,currentUserType = currentUserType)
+
+
+
+@app.route("/generate_test", methods=["GET", "POST"])
+def generate_test():
+
+
+    file = request.files["file"]
+    session["filepath"] = secure_filename(file.filename)
+    file.save(secure_filename(file.filename))
+
+    if request.method=='POST':
+        session["subject"] = request.form['subject']
+    else:
+        session["subject"] = request.args.get['subject']
+    print(session["filepath"])
+
+    codd=''.join(random.choice(string.ascii_uppercase + string.ascii_uppercase + string.digits) for _ in range(8))
+
+    # today=date.today()
+    # date_form=''
+    # date_form=str(today.day)+'/'+ str(today.month)+'/'+ str(today.year)
+    testt=Test(subject=session["subject"],date_created=date.today(),teacher_id=current_user.id,code=codd,status=1,max_score=10)
+    db.session.add(testt)
+    db.session.commit()
+    
+
+    
+        # Generate objective test
+    objective_generator = ObjectiveTest(session["filepath"])
+    question_list, answer_list = objective_generator.generate_test()
+    for ans in answer_list:
+        global_answers.append(ans)
+    
+    return render_template(
+        "objective_test.html",
+        # username=session["username"],
+        testname=session["subject"],
+        question1=question_list[0],
+        question2=question_list[1],
+        question3=question_list[2]
+    )
+    # elif session["test_id"] == "1":
+    #     # Generate subjective test
+    #     subjective_generator = SubjectiveTest(session["filepath"])
+    #     question_list, answer_list = subjective_generator.generate_test(num_of_questions=2)
+    #     for ans in answer_list:
+    #         global_answers.append(ans)
+        
+    #     return render_template(
+    #         "subjective_test.html",
+    #         username=session["username"],
+    #         testname=session["subject_name"],
+    #         question1=question_list[0],
+    #         question2=question_list[1]
+    #     )
+    # else:
+    #     print("Done!")
+    #     return None

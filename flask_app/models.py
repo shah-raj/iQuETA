@@ -3,7 +3,6 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask_app import db, login_manager, app, currentUserType
 from flask_login import UserMixin
 
-
 @login_manager.user_loader
 def load_user(user_id):
     if currentUserType.isTeacher():
@@ -64,13 +63,13 @@ class Student(db.Model, UserMixin):
 class Test(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.String(100), nullable=False)
-    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    date_created = db.Column(db.Date, nullable=False, default=datetime.utcnow)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'), nullable=False)
     code = db.Column(db.String(8),nullable = False)
     status = db.Column(db.Boolean,nullable = False)
     questions = db.relationship('Questions', backref='test', lazy=True)
     max_score = db.Column(db.Integer)
-    marks = db.relationship('Marks', backref='test', lazy=True)
+    # marks = db.relationship('Marks', backref='test', lazy=True)
     def __repr__(self):
         return f"Test('{self.subject}' - '{self.date_created}')"
 

@@ -11,6 +11,14 @@
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+    function myFunction() {
+      var checkBox = document.getElementById("myCheck");
+      if (checkBox.checked == true){
+        document.getElementById("file_br").style.display="block";
+      }
+    }
+  </script>
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
 
@@ -43,7 +51,7 @@
                 {% if currentUserType.isStudent() %}
                   <a class="nav-item nav-link" href="#"> Enter Test Code</a>
                 {% else %}
-                  <a class="nav-item nav-link" href="#"> Create New Test</a>
+                  <a class="nav-item nav-link" href="{{ url_for('create_test') }}"> Create New Test</a>
                 {% endif %}
                 <a class="nav-item nav-link" href="{{ url_for('account') }}"> {{current_user.name}}'s Account</a>
                 <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>

@@ -8,3 +8,4 @@ wtforms
 Pillow
 python-decouple	
 git+https://github.com/mitsuhiko/flask-oauth
+email_validator
