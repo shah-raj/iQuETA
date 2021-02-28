@@ -2,8 +2,7 @@ import os, secrets, json ,sys
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort, jsonify, Flask, session
 from flask_app import app, db, bcrypt, mail, google, REDIRECT_URI, currentUserType
-from flask_app.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
-                             RequestResetForm, ResetPasswordForm)
+from flask_app.forms import *
 from flask_app.models import Teacher, Student, Questions, Test, Marks
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
@@ -12,7 +11,7 @@ from urllib.parse import urlparse
 from werkzeug.utils import secure_filename
 from flask_app.objective import ObjectiveTest
 import random
-from datetime import date
+from datetime import date, datetime
 
 import string
 from flask_app.models import Test
@@ -31,17 +30,6 @@ def home():
 @app.route("/about")
 def about():
     return render_template('about.html', title='About',currentUserType = currentUserType)
-
-
-
-
-
-
-
-
-
-
-
 
 @app.route("/create_test")
 def create_test():
@@ -82,7 +70,7 @@ def tlogin():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('dashboard'))
     form = LoginForm()
     if form.google.data:
         access_token = session.get('access_token')
@@ -110,7 +98,7 @@ def login():
             user = Teacher.query.filter_by(email=json_obj['email']).first()
         login_user(user, remember=form.remember.data)
         next_page = request.args.get('next')
-        return redirect(next_page) if next_page else redirect(url_for('home'))
+        return redirect(next_page) if next_page else redirect(url_for('dashboard'))
 
     if form.validate_on_submit():
         if currentUserType.isStudent():
@@ -124,7 +112,7 @@ def login():
             user.authenticated = True
             # print(current_user,file=sys.stderr)
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('home'))
+            return redirect(next_page) if next_page else redirect(url_for('dashboard'))
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
     return render_template('login.html', title='Login', form=form,currentUserType = currentUserType)
@@ -237,15 +225,6 @@ def reset_token(token):
         return redirect(url_for('login'))
     return render_template('reset_token.html', title='Reset Password', form=form,currentUserType = currentUserType)
 
-@app.route("/code",methods=['POST', 'GET'])
-def code():
-    if request.method=='POST':
-        c = request.form['code']
-        t = Test.query.filter_by(code=c).first()
-        return redirect(url_for("test",testId=t.id))
-    return render_template('code.html', title='Code',currentUserType = currentUserType)
-
-
 @app.route("/generate_test", methods=["GET", "POST"])
 def generate_test():
     file = request.files["file"]
@@ -295,4 +274,28 @@ def test(testId):
             if request.form[selected] == str(q.ans):
                 result += 1
             total += 1
-        return render_template('results.html', total=total, result=result, currentUserType=currentUserType)
+        m = Marks(test_id=testId,student_id=current_user.id, score=result,date_of_attempt=datetime.now())
+        db.session.add(m)
+        db.session.commit()
+        return redirect(url_for("result",testId=testId))
+
+@app.route("/result/<int:testId>", methods=['POST', 'GET'])
+def result(testId):
+    r = Marks.query.filter_by(id=testId).first()
+    t = Test.query.filter_by(id=r.test_id).first()
+    prc = (r.score/t.max_score) * 100
+    return render_template('result.html', percentage=prc, subject=t.subject ,currentUserType=currentUserType)
+
+@app.route("/dashboard",methods=['POST', 'GET'])
+@login_required
+
+def dashboard():
+    if currentUserType.isStudent():
+        code_form = CodeForm()
+        if code_form.validate_on_submit():
+            c = code_form.code.data
+            t = Test.query.filter_by(code=c).first()
+            return redirect(url_for("test",testId=t.id))
+        return render_template('studdash.html', title='Dashboard', form=code_form ,currentUserType = currentUserType)
+    else:
+        return render_template('teacherdash.html', title='Dashboard',currentUserType = currentUserType)

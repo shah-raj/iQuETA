@@ -1,0 +1,8 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div>
+        <h1>{{current_user.name}}, Check your Results for {{ subject }}</h1>
+        <br>
+        <h2>You scored {{ percentage }}%</h2>
+    </div>
+{% endblock content %}
