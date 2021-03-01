@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+
+    {% if title %}
+        <title>iQuETA - {{ title }}</title>
+    {% else %}
+        <title>iQuETA</title>
+    {% endif %}
+    <style>
+      table.dataframe, .dataframe th, .dataframe td {
+        border: none;
+        border-bottom: 1px solid #C8C8C8;
+        border-collapse: collapse;
+        text-align:center;
+        padding: 10px;
+        margin-bottom: 40px;
+        font-size: 0.9em;
+        }
+
+      .male th {
+        background-color: #809fff;
+        color: white;
+
+          }
+
+      tr:nth-child(odd)   
+      { background-color:#eee; }
+      tr:nth-child(even)  
+      { background-color:#fff; }
+
+      tr:hover            
+      { background-color: #ffff99;}
+
+
+
+      .onoff{
+        height: 20px;
+        padding:1px 5px;
+        color:#fff;
+        border-radius: 5px;
+        width:60px;
+        text-align: center;
+        margin-bottom: :20px;
+        margin-top:20px;
+      }
+      .onoff-on:before{
+        content: 'ON';
+      }
+      .onoff-off:before{
+        content: 'OFF';
+
+      }
+      .onoff-on{
+        background-color: #00a65a;
+        border-color: #008d4c;
+        border-right: 30px solid #ddd;
+        cursor: pointer;
+      }
+      .onoff-off{
+        background-color: #f56954;
+        border-color: #f4543c;
+        border-left: 30px solid #ddd;
+        cursor: pointer;
+      }
+    </style>
+    <script type="text/javascript">
+    $(document).on('click','.onoff',function(){
+    $(this).toggleClass('onoff-on');
+    $(this).toggleClass('onoff-off');
+  });
+</script>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="{{url_for('static',filename='js/jquery-3.2.1.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
+
+</head>
+<body>
+    <header class="site-header">
+      <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+        <div class="container">
+
+            <a class="navbar-brand mr-4" href="{{ url_for('home') }}"><b>iQuETA</b> <i>Teacher</i></a>
+
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarToggle">
+            <div class="navbar-nav mr-auto">
+            </div>
+            <!-- Navbar Right Side -->
+            <div class="navbar-nav">
+              {% if current_user.is_authenticated %}
+
+                  <a class="nav-item nav-link" href="" data-toggle="modal" data-target="#mymodal" > Create New Test</a>
+                <a class="nav-item nav-link" href="{{ url_for('account') }}"> {{current_user.name}}'s Account</a>
+                <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
+              {% else %}
+                <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
+                <a class="nav-item nav-link" href="{{ url_for('register') }}">Register</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main role="main" class="container">
+      <div class="row">
+        <div class="col-md-8">
+          
+          {% block content %}{% endblock %}
+
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+          {% for message in messages %}
+          <div class="alert alert-success alert-dismissable" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="close">
+              <span aria-hidden="true">x</span>
+            </button>
+            {{message}}
+          </div>
+          
+          {% endfor %}
+          {% endif %}
+          {% endwith %}
+              <h3>Created Tests</h3>
+
+
+
+
+
+
+
+                        
+
+                    <table class="dataframe male">  
+                    <thead>  
+
+                        <th>ID</th>  
+                        <th>Subject</th>
+                        <th>Date</th>  
+                        <th>Teacher ID</th> 
+                        <th>Test Code</th>
+                        
+                        <th>Max Score</th>
+                        <th>Status</th>    
+                    </thead>
+
+
+
+
+                      
+                    {% for r in rows %} 
+                    
+                      
+                        <tr>  
+                            <td>{{r.id}}</td>  
+                            <td>{{r.subject}}</td>
+                            <td>{{r.date_created}}</td>  
+                            <td>{{r.teacher_id}}</td>
+                            <td>{{r.code}}</td>
+                            
+                            <td>{{r.max_score}}</td>
+                            <td>
+                              {% if (r.status==True): %}<div class="wrapper">
+                                <div class="onoff onoff-on"></div>
+                              </div>
+                              {% else %}
+                              <div class="wrapper">
+                                <div class="onoff onoff-off"></div>
+                              </div>
+                              {% endif %}
+                            </td>
+                            <td><a href="/update/{{r.id}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit{{r.id}}">Edit</a>
+                            <a href="/delete/{{r.id}}" class="btn btn-default btn-xs" onclick="return confirm('Are you sure you want to delete?')">Delete</a>
+                            </td>
+
+                        </tr> 
+
+
+<!--                         Edit button
+ -->
+                        <div id="modaledit{{r.id}}" class="modal fade" role="dialog">
+                         <div class="modal-dialog">
+                       
+                       
+                            <div class="modal-content">
+                       
+                       
+                               <div class="modal-header">
+                       
+                       
+                                  <h4 class="modal-title">Update Information</h4>
+                       
+                       
+                               </div>
+                       
+                       
+                               <div class="modal-body">
+                       
+                       
+                                  <form action="{{url_for('update')}}" method="POST">
+                       
+                       
+                                     <div class="form-group">
+                       
+                       
+                                        <label>Subject:</label>
+                                         <input type="hidden"  name="id" value="{{r.id}}">
+                       
+                                        <input type="text" class="form-control" name="subject" value="{{r.subject}}">
+                       
+                       
+                                     </div>
+                       
+                       
+                       
+                                     <div class="form-group">
+                       
+                       
+                                        <label>Max Score:</label>
+                       
+                                        <input type="text" class="form-control" name="max_score" value="{{r.max_score}}">
+                       
+                       
+                                     </div>
+                       
+                       
+                                     <div class="form-group">
+                       
+                                      
+                                        <label>Status:</label>
+                                        <input type="text" class="form-control" name="status" value="{{r.status}}">
+                                      
+                       
+                       
+                                     </div>
+                       
+                       
+                                     <div class="form-group">
+                       
+                       
+                                        <button class="btn btn-primary" type="submit">Update</button>
+                       
+                       
+                                     </div>
+                       
+                       
+                                  </form>
+                       
+                       
+                               </div>
+                       
+                       
+                               <div class="modal-footer">
+                       
+                       
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                       
+                       
+                               </div>
+                       
+                       
+                            </div>
+                       
+                       
+                         </div>
+                       
+                      </div> 
+                      
+                    {% endfor %}  
+                </table> 
+
+
+<!-- Create New Test
+ -->                
+ <div id="mymodal" class="modal fade" role="dialog">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+ 
+            <h4 class="modal-title">Create Test</h4>
+         </div>
+         <div class="modal-body">
+ 
+            <form class="contact1-form validate-form" action="{{url_for('insert')}}" method="POST" enctype="multipart/form-data" method="POST">
+ 
+ 
+               <div class="form-group">
+ 
+                   <input type="file" name="file" />
+
+ 
+ 
+               </div>
+ 
+ 
+                <div class="form-group">
+ 
+ 
+                  <label>Subject:</label>
+                  <input type="text" placeholder="Enter subject" name="subject">
+ 
+ 
+               </div>
+ 
+ 
+ 
+ 
+ 
+               <div class="form-group">
+ 
+ 
+                  <button class="btn btn-primary" type="submit">Create Test</button>
+ 
+ 
+               </div>
+ 
+ 
+            </form>
+ 
+ 
+         </div>
+ 
+ 
+         <div class="modal-footer">
+ 
+ 
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+ 
+ 
+         </div>
+ 
+ 
+      </div>
+ 
+ 
+   </div>
+ 
+ 
+</div>
+
+
+
+
+        </div>
+      </div>
+    </main>
+  </body>
+
+</html>

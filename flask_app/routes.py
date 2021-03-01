@@ -117,6 +117,77 @@ def login():
             flash('Login Unsuccessful. Please check email and password', 'danger')
     return render_template('login.html', title='Login', form=form,currentUserType = currentUserType)
 
+
+
+@app.route('/insert', methods = ['POST','GET'])
+def insert():
+ 
+    file = request.files["file"]
+    session["filepath"] = secure_filename(file.filename)
+    file.save(secure_filename(file.filename))
+
+    if request.method=='POST':
+        session["subject"] = request.form['subject']
+    else:
+        session["subject"] = request.args.get['subject']
+    # print(session["filepath"])
+
+    codd=''.join(random.choice(string.ascii_uppercase + string.ascii_uppercase + string.digits) for _ in range(8))
+
+    testt=Test(subject=session["subject"],date_created=date.today(),teacher_id=current_user.id,code=codd,status=1,max_score=10)
+    db.session.add(testt)
+    db.session.commit()
+    
+
+    
+        # Generate objective test
+    objective_generator = ObjectiveTest(session["filepath"])
+    question_list, answer_list = objective_generator.generate_test()
+    for ans in answer_list:
+        global_answers.append(ans)
+     
+    flash("Test created Successfully")
+
+    return redirect(url_for('dashboard'))
+ 
+ 
+@app.route('/update', methods = ['GET', 'POST'])
+def update():
+ 
+    if request.method == 'POST':
+        my_data = Test.query.get(request.form.get('id'))
+ 
+        my_data.subject = request.form['subject']
+        my_data.max_score = request.form['max_score']
+        my_data.status = request.form['status']
+        if my_data.status=='False':
+            my_data.status=0
+        if my_data.status=='True':
+            my_data.status=1
+        else:
+            my_data.status=int(my_data.status)
+ 
+        db.session.commit()
+        flash("Test Updated Successfully")
+ 
+        return redirect(url_for('dashboard'))
+ 
+ 
+ 
+ 
+@app.route('/delete/<id>/', methods = ['GET', 'POST'])
+def delete(id):
+    my_data = Test.query.get(id)
+    db.session.delete(my_data)
+    db.session.commit()
+    flash("Test Deleted Successfully")
+ 
+    return redirect(url_for('dashboard'))
+
+
+
+    
+
 @app.route('/googleLogin')
 def googleLogin():
     callback=url_for('authorized', _external=True)
@@ -298,4 +369,6 @@ def dashboard():
             return redirect(url_for("test",testId=t.id))
         return render_template('studdash.html', title='Dashboard', form=code_form ,currentUserType = currentUserType)
     else:
-        return render_template('teacherdash.html', title='Dashboard',currentUserType = currentUserType)
+        dat=Test.query.all()
+        print(dat)
+        return render_template('teacher_dash.html', title='Dashboard',currentUserType = currentUserType,rows=dat)
