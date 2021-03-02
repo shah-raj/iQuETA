@@ -14,7 +14,7 @@ import random
 from datetime import date, datetime
 
 import string
-from flask_app.models import Test
+from flask_app.models import Test,Questions
 
 global_answers=list()
 
@@ -151,6 +151,25 @@ def insert():
     return redirect(url_for('dashboard'))
  
  
+@app.route('/add_question', methods = ['POST','GET'])
+def add_question():
+    if request.method=='POST':
+        i=request.form['test_id']
+        q = request.form['question_text']
+        a = request.form['ans']
+        o1 = request.form['op1']
+        o2 = request.form['op2']
+        o3 = request.form['op3']
+        o4 = request.form['op4']
+
+        res=Questions(question_text=q,test_id=i,ans=a,op1=o1,op2=o2,op3=o3,op4=o4)
+        db.session.add(res)
+        db.session.commit()
+        flash("Question added Successfully")
+        return redirect(url_for('viewqns',id=i))
+
+
+
 @app.route('/update', methods = ['GET', 'POST'])
 def update():
  
@@ -177,16 +196,27 @@ def update():
  
 @app.route('/delete/<id>/', methods = ['GET', 'POST'])
 def delete(id):
+
     my_data = Test.query.get(id)
     db.session.delete(my_data)
     db.session.commit()
+
+
     flash("Test Deleted Successfully")
  
     return redirect(url_for('dashboard'))
 
 
 
-    
+@app.route('/viewqns/<id>/', methods = ['GET', 'POST'])
+def viewqns(id):
+    my_data=Questions.query.filter_by(test_id=id).all()
+    return render_template('viewqns.html', title='viewqns',currentUserType = currentUserType,rows=my_data,tid=id)
+
+
+
+
+
 
 @app.route('/googleLogin')
 def googleLogin():
