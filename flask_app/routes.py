@@ -31,6 +31,10 @@ def home():
 def about():
     return render_template('about.html', title='About',currentUserType = currentUserType)
 
+@app.route("/ourteam")
+def ourteam():
+    return render_template('ourteam.html', title='OurTeam',currentUserType = currentUserType)
+
 @app.route("/create_test")
 def create_test():
     return render_template('create_test.html', title='Create_test',currentUserType = currentUserType)
