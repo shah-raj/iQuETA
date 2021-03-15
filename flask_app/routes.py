@@ -166,11 +166,63 @@ def add_question():
         o3 = request.form['op3']
         o4 = request.form['op4']
 
-        res=Questions(question_text=q,test_id=i,ans=a,op1=o1,op2=o2,op3=o3,op4=o4)
-        db.session.add(res)
+        if a==o1 or a==o2 or a==o3 or a==o4:
+
+            res=Questions(question_text=q,test_id=i,ans=a,op1=o1,op2=o2,op3=o3,op4=o4)
+            db.session.add(res)
+            db.session.commit()
+            flash("Question added Successfully")
+            return redirect(url_for('viewqns',id=i))
+        else:
+            flash("Invalid options")
+            return redirect(url_for('viewqns',id=i))
+
+
+@app.route('/up_question/<id>/', methods = ['POST','GET'])
+def up_question(id):
+    
+    i=request.form['checkboxvalue']
+    print(i)
+    m=list(i)
+    print(m)
+    for i in m:
+        if i==',':
+            m.remove(',')
+            continue
+    k=[]
+    for i in m:
+        k.append(int(i))
+
+    print("These are selected:",k)
+    # m = i.split(", ")
+
+    # for j in i[0:len(i):2]:
+    #     print(j)
+    #     m.append(int(j))
+    allqs=Questions.query.filter_by(test_id=id).with_entities(Questions.id).all()
+    tot=[]
+    for a in allqs:
+        tot.append(a[0])
+    print(tot)
+    final=tot
+    for i in k:
+        if i in final:
+            final.remove(i)
+    print(final)
+    for i in final:
+        my_data = Questions.query.get(i)
+        db.session.delete(my_data)
         db.session.commit()
-        flash("Question added Successfully")
-        return redirect(url_for('viewqns',id=i))
+
+    flash("Questions updated Successfully")
+
+    
+
+    # res=Questions(question_text=q,test_id=i,ans=a,op1=o1,op2=o2,op3=o3,op4=o4)
+    # db.session.add(res)
+    # db.session.commit()
+    return redirect(url_for('dashboard'))
+    # return redirect(url_for('dashboard'))
 
 
 
@@ -196,11 +248,14 @@ def update():
         return redirect(url_for('dashboard'))
  
  
- 
+
  
 @app.route('/delete/<id>/', methods = ['GET', 'POST'])
 def delete(id):
-
+    firstt=Questions.query.filter_by(test_id=id).all()
+    for x in firstt:
+        db.session.delete(x)
+        db.session.commit()
     my_data = Test.query.get(id)
     db.session.delete(my_data)
     db.session.commit()
@@ -403,6 +458,6 @@ def dashboard():
             return redirect(url_for("test",testId=t.id))
         return render_template('studdash.html', title='Dashboard', form=code_form ,currentUserType = currentUserType)
     else:
-        dat=Test.query.all()
+        dat=Test.query.filter_by(teacher_id=current_user.id).all()
         print(dat)
         return render_template('teacher_dash.html', title='Dashboard',currentUserType = currentUserType,rows=dat)

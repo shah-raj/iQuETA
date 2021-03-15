@@ -15,7 +15,7 @@ import numpy as np
 from nltk.corpus import wordnet as wn
 similar_words = []
 from flask_app import app, db, bcrypt, mail, google, REDIRECT_URI, currentUserType
-from flask_app.models import Questions
+from flask_app.models import Questions,Test
 
 class ObjectiveTest:
     """Class abstraction for objective test generation module
@@ -210,14 +210,20 @@ class ObjectiveTest:
         #     print(question[i])
         # for i in range(2):
         #     print(similar_words[i])
-
+        tids=Test.query.with_entities(Test.id).all()
+        
+        tot=[]
+        for a in tids:
+            tot.append(a[0])
+        print("The test ids are:",tot)
         for i in range(len(question)):
         #     print(question[i])
         #     print(answer[i])
         #     print(similar_words[i][0],similar_words[i][1],similar_words[i][2],similar_words[i][3])
         #     print(len(similar_words[i]))
-            
-            result=Questions(question_text=question[i],test_id=2,ans=answer[i],op1=similar_words[i][0],op2=similar_words[i][1],op3=similar_words[i][2],op4=similar_words[i][3])
+            # tids=Test.query.with_entities(Test.id).all()
+            # print("The test ids are:",tids)
+            result=Questions(question_text=question[i],test_id=tot[-1],ans=answer[i],op1=similar_words[i][0],op2=similar_words[i][1],op3=similar_words[i][2],op4=similar_words[i][3])
             db.session.add(result)
             db.session.commit()
 
