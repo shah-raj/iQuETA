@@ -23,7 +23,7 @@ global_answers=list()
 def home():
     # print(currentUserType.isStudent(),file=sys.stderr)
     if current_user.is_authenticated:
-        return render_template('about.html',currentUserType = currentUserType)
+        return redirect(url_for('dashboard'))
     else:
         return render_template('home.html',currentUserType = currentUserType)
 

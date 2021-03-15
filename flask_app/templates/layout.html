@@ -56,8 +56,11 @@
                   <a class="nav-item nav-link" href="" data-toggle="modal" data-target="#exampleModal"> Enter Test Code</a>
                   
                 {% else %}
-                  <a class="nav-item nav-link" href="{{ url_for('create_test') }}"> Create New Test</a>
-                {% endif %}
+                  <!-- <a class="nav-item nav-link" href="{{ url_for('create_test') }}"> Create New Test</a> -->
+                  <a class="nav-item nav-link" href="" data-toggle="modal" data-target="#createNewTestModal"> Create New Test</a>
+
+                  {% endif %}
+
                 <a class="nav-item nav-link" href="{{ url_for('account') }}"> {{current_user.name}}'s Account</a>
                 <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
               {% else %}
@@ -71,7 +74,7 @@
     </header>
     <main role="main" class="container">
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-11">
           {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
               {% for category, message in messages %}
@@ -88,5 +91,34 @@
         </div>
       </div>
     </main>
+    <div id="createNewTestModal" class="modal fade" role="dialog">
+      <div class="modal-dialog modal-dialog-centered">
+         <div class="modal-content">
+            <div class="modal-header">
+    
+               <h4 class="modal-title">Create Test</h4>
+            </div>
+            <div class="modal-body">
+             
+               <form class="contact1-form validate-form" action="{{url_for('insert')}}" method="POST" enctype="multipart/form-data" method="POST"> 
+                  <div class="form-group">
+                    <label>Choose a file:</label>
+                      <input type="file" name="file"/>
+                  </div>
+                   <div class="form-group">
+                     <label>Subject:</label>
+                     <input type="text" placeholder="Enter subject" name="subject">
+                  </div>
+                  <div class="form-group">
+                     <button class="btn btn-outline-info" type="submit">Create Test</button>
+                  </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Close</button>
+            </div>
+         </div>
+      </div>
+   </div>
   </body>
 </html>
