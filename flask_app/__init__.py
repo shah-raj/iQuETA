@@ -2,7 +2,7 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from flask_login import LoginManager
+from flask_login import LoginManager,logout_user
 from flask_mail import Mail
 from urllib.request import Request, urlopen, URLError
 from urllib.parse import urlparse

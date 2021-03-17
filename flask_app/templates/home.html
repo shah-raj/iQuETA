@@ -6,9 +6,7 @@
         <title>iQuETA</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
         <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
-
         <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-theme.min.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/fontAwesome.css') }}">
@@ -18,142 +16,133 @@
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
         <script src="js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
     </head>
-<body>
-    <section class="banner" id="top">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="left-banner-content">
-                        <div class="text-content">
-                            <h6>One platform for all Tests</h6>
-                            <div class="line-dec"></div>
-                            <h1>iQueta</h1>
-                            <div class="white-border-button">
-                                <a href="#" class="scroll-link" data-id="best-offer-section" style="color: #000">Discover More</a>
-                                &nbsp
-                            <a href=" {{ url_for('ourteam')}}"  data-id="best-offer-section" style="color: #000">About Us</a>
-
+    <body>
+        <section class="banner" id="top">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="left-banner-content">
+                            <div class="text-content">
+                                <h6>One platform for all Tests</h6>
+                                <div class="line-dec"></div>
+                                <h1>iQueta</h1>
+                                <div class="white-border-button">
+                                    <a href="#" class="scroll-link" data-id="best-offer-section" style="color: #000">Discover More</a>
+                                    &nbsp
+                                    <a href=" {{ url_for('ourteam')}}"  data-id="best-offer-section" style="color: #000">About Us</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="right-banner-content">
-                        <div class="logo"><a href="index.html"><img src="{{ url_for('static', filename='img/teacher (1).png') }}"></a></div>
-                        <h3>Generate Your Own </h3>
-                        <span>Automated <em>Test</em> </span>
-                        <div class="line-dec"></div>
+                    <div class="col-md-4">
+                        <div class="right-banner-content">
+                            <div class="logo"><img src="{{ url_for('static', filename='img/teacher (1).png') }}"></a></div>
+                            <h3>Generate Your Own </h3>
+                            <span>Automated <em>Test</em> </span>
+                            <div class="line-dec"></div>
                             <div class="white-border-button">
                                 <a href="{{ url_for('tlogin') }}"  data-id="best-offer-section" style="color: #000">Teacher Login</a>
                             </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-
-    <section class="best-offer" id=best-offer-section>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="best-offer-left-content">
-                        <div class="icon"><img src="{{ url_for('static', filename='img/student.png') }}"></div>
-                        <h4>Attempt Test</h4>
-                        <h5>And Get Evaluated</h5>
-
-<div class="white-border-button" style="margin-top: 13px">
+        </section>
+        <section class="best-offer" id="best-offer-section">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="best-offer-left-content" style="padding-top: 20%; background-color: #b6857a;">
+                            <div class="icon" style="margin-top:0px"><img src="{{ url_for('static', filename='img/student.png') }}"></div>
+                            <h4>Attempt Test</h4>
+                            <h5>And Get <em>Evaluated</em> </h5>
+                            <div class="line-dec" style="width: 80%; height: 5px; background-color: #fff; margin: 10px auto; margin-bottom: 40px;"></div>
+                            <div class="white-border-button" style="margin-top: 13px">
                                 <a href="{{ url_for('slogin') }}"  data-id="best-offer-section" style="color: #000">Student Login</a>
                             </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-8">
-                    <div class="best-offer-right-content">
-                        <div class="row">
-                            <div class="col-md-6 col-sm-12">
-                                <h2>How <em>iQuETA</em><br> Works?</h2>
-                                <p><strong>iQuETA </strong> which stands for Intelligent Question Extractor and Test Assesment is a platform which where faculties can 
-                                generate test and student can appear that test in the same platform.</p>
-                                <p>Steps to use iQuETA: </p>
-                                <ul>
-                                    <li>+ Upload a file.</li>
-                                    <li>+ Select questions, add questions and create test.</li>
-                                    <li>+ Share test code.</li>
-                                    <li>+ Appear test.</li>
-                                </ul>
-                                <div class="pink-button">
+                    <div class="col-md-8">
+                        <div class="best-offer-right-content">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-12">
+                                    <h2>How <em>iQuETA</em><br> Works?</h2>
+                                    <p><strong>iQuETA </strong> which stands for Intelligent Question Extractor and Test Assesment is a platform which where faculties can 
+                                        generate test and student can appear that test in the same platform.
+                                    </p>
+                                    <p>Steps to use iQuETA: </p>
+                                    <ul>
+                                        <li>+ Upload a file.</li>
+                                        <li>+ Select questions, add questions and create test.</li>
+                                        <li>+ Share test code.</li>
+                                        <li>+ Appear test.</li>
+                                    </ul>
+                                    <div class="pink-button">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6 col-sm-12">
-                                <img src="img/best-offer-image.png" alt="">
+                                <div class="col-md-6 col-sm-12">
+                                    <img src="img/best-offer-image.png" alt="">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-   
-
-    <footer>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <p>Copyright &copy; 2021
-                    
-                    - <a rel="nofollow" href="#" target="_parent">iQuETA</a> 
-                    by <a rel="nofollow" href="#" target="_parent">KJSCE</a></p>
+        </section>
+        <footer>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <p>Copyright &copy; 2021
+                            - <a rel="nofollow" href="#" target="_parent">iQuETA</a> 
+                            by <a rel="nofollow" href="#" target="_parent">KJSCE</a>
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </footer>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
-
-    <script src="js/vendor/bootstrap.min.js"></script>
-    
-    <script src="js/datepicker.js"></script>
-    <script src="js/plugins.js"></script>
-    <script src="js/main.js"></script>
-
-    <script type="text/javascript">
-    $(document).ready(function() 
-	{
-        // navigation click actions 
-        $('.scroll-link').on('click', function(event){
-            event.preventDefault();
-            var sectionID = $(this).attr("data-id");
-            scrollToID('#' + sectionID, 750);
-        });
-        // scroll to top action
-        $('.scroll-top').on('click', function(event) {
-            event.preventDefault();
-            $('html, body').animate({scrollTop:0}, 'slow');         
-        });
-        // mobile nav toggle
-        $('#nav-toggle').on('click', function (event) {
-            event.preventDefault();
-            $('#main-nav').toggleClass("open");
-        });
-    });
-    // scroll function
-    function scrollToID(id, speed){
-        var offSet = 0;
-        var targetOffset = $(id).offset().top - offSet;
-        var mainNav = $('#main-nav');
-        $('html,body').animate({scrollTop:targetOffset}, speed);
-        if (mainNav.hasClass("open")) {
-            mainNav.css("height", "1px").removeClass("in").addClass("collapse");
-            mainNav.removeClass("open");
-        }
-    }
-    if (typeof console === "undefined") {
-        console = {
-            log: function() { }
-        };
-    }
-    </script>
-</body>
+        </footer>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
+        <script src="js/vendor/bootstrap.min.js"></script>
+        <script src="js/datepicker.js"></script>
+        <script src="js/plugins.js"></script>
+        <script src="js/main.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() 
+            {
+                // navigation click actions 
+                $('.scroll-link').on('click', function(event){
+                    event.preventDefault();
+                    var sectionID = $(this).attr("data-id");
+                    scrollToID('#' + sectionID, 750);
+                });
+                // scroll to top action
+                $('.scroll-top').on('click', function(event) {
+                    event.preventDefault();
+                    $('html, body').animate({scrollTop:0}, 'slow');         
+                });
+                // mobile nav toggle
+                $('#nav-toggle').on('click', function (event) {
+                    event.preventDefault();
+                    $('#main-nav').toggleClass("open");
+                });
+            });
+            // scroll function
+            function scrollToID(id, speed){
+                var offSet = 0;
+                var targetOffset = $(id).offset().top - offSet;
+                var mainNav = $('#main-nav');
+                $('html,body').animate({scrollTop:targetOffset}, speed);
+                if (mainNav.hasClass("open")) {
+                    mainNav.css("height", "1px").removeClass("in").addClass("collapse");
+                    mainNav.removeClass("open");
+                }
+            }
+            if (typeof console === "undefined") {
+                console = {
+                    log: function() { }
+                };
+            }
+        </script>
+    </body>
 </html>

@@ -223,7 +223,7 @@ class ObjectiveTest:
         #     print(len(similar_words[i]))
             # tids=Test.query.with_entities(Test.id).all()
             # print("The test ids are:",tids)
-            result=Questions(question_text=question[i],test_id=tot[-1],ans=answer[i],op1=similar_words[i][0],op2=similar_words[i][1],op3=similar_words[i][2],op4=similar_words[i][3])
+            result=Questions(question_text=question[i],test_id=tot[-1],ans=answer[i],op1=similar_words[i][0],op2=similar_words[i][1],op3=similar_words[i][2],op4=answer[i])
             db.session.add(result)
             db.session.commit()
 

@@ -1,6 +1,6 @@
 import os, secrets, json ,sys
 from PIL import Image
-from flask import render_template, url_for, flash, redirect, request, abort, jsonify, Flask, session
+from flask import render_template, url_for, flash, redirect, request, abort, jsonify, Flask, session, make_response
 from flask_app import app, db, bcrypt, mail, google, REDIRECT_URI, currentUserType
 from flask_app.forms import *
 from flask_app.models import Teacher, Student, Questions, Test, Marks
@@ -18,11 +18,22 @@ from flask_app.models import Test,Questions
 
 global_answers=list()
 
+def get_user():
+    type = request.cookies.get('userType')
+    return type
+
 @app.route("/")
 @app.route("/home", methods=['GET', 'POST'])
 def home():
     # print(currentUserType.isStudent(),file=sys.stderr)
     if current_user.is_authenticated:
+        u = Teacher.query.filter_by(email=current_user.email).first()
+        if u:
+            currentUserType.setTypeToTeacher()
+        else:
+            u = Student.query.filter_by(email=current_user.email).first()
+            if u:
+                currentUserType.setTypeToStudent()
         return redirect(url_for('dashboard'))
     else:
         return render_template('home.html',currentUserType = currentUserType)
@@ -41,25 +52,34 @@ def create_test():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+    userType = request.cookies.get('userType')
+    if userType:
+        if userType == 'student':
+            currentUserType.setTypeToStudent()
+        else:
+            currentUserType.setTypeToTeacher()
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        # form.user_type.choices = [(i,j) for i,j in RegistrationForm.choices]
-        # if form.user_type.data == 'Student':
         if currentUserType.isStudent():
             user = Student(name=form.name.data, email=form.email.data, password=hashed_password)
-        else:
+        elif currentUserType.isTeacher():
             user = Teacher(name=form.name.data, email=form.email.data, password=hashed_password)
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
         if currentUserType.isStudent():
             return redirect(url_for('login'))
-        else:
+        elif currentUserType.isTeacher():
             return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form,currentUserType = currentUserType)
+    resp = make_response(render_template('register.html', title='Register', form=form,currentUserType = currentUserType))
+    if currentUserType.isStudent():
+        resp.set_cookie('userType','student')
+    elif currentUserType.isTeacher():
+        resp.set_cookie('userType','teacher')
+    return resp
 
 @app.route("/slogin")
 def slogin():
@@ -73,6 +93,12 @@ def tlogin():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+    userType = request.cookies.get('userType')
+    if userType:
+        if userType == 'student':
+            currentUserType.setTypeToStudent()
+        elif userType == 'teacher':
+            currentUserType.setTypeToTeacher()
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
     form = LoginForm()
@@ -98,7 +124,7 @@ def login():
         json_obj = json.loads(output)
         if currentUserType.isStudent():
             user = Student.query.filter_by(email=json_obj['email']).first()
-        else:
+        elif currentUserType.isTeacher():
             user = Teacher.query.filter_by(email=json_obj['email']).first()
         login_user(user, remember=form.remember.data)
         next_page = request.args.get('next')
@@ -108,7 +134,7 @@ def login():
         if currentUserType.isStudent():
             user = Student.query.filter_by(email=form.email.data).first()
             currentUserType.setTypeToStudent()
-        else:
+        elif currentUserType.isTeacher():
             user = Teacher.query.filter_by(email=form.email.data).first()
             currentUserType.setTypeToTeacher()   
         if user and bcrypt.check_password_hash(user.password, form.password.data):
@@ -119,7 +145,12 @@ def login():
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
-    return render_template('login.html', title='Login', form=form,currentUserType = currentUserType)
+    resp = make_response(render_template('login.html', title='Login', form=form,currentUserType = currentUserType))
+    if currentUserType.isStudent():
+        resp.set_cookie('userType', 'student')
+    elif currentUserType.isTeacher():
+        resp.set_cookie('userType','teacher')
+    return resp
 
 
 
@@ -357,7 +388,7 @@ def reset_request():
     if form.validate_on_submit():
         if currentUserType.isStudent():
             user = Student.query.filter_by(email=form.email.data).first()
-        else:
+        elif currentUserType.isTeacher():
             user = Teacher.query.filter_by(email=form.email.data).first()
         send_reset_email(user)
         flash('An email has been sent with instructions to reset your password.', 'info')
@@ -371,7 +402,7 @@ def reset_token(token):
         return redirect(url_for('home'))
     if currentUserType.isStudent():
         user = Student.verify_reset_token(token)
-    else:
+    elif currentUserType.isTeacher():
         user = Teacher.verify_reset_token(token)
     if user is None:
         flash('That is an invalid or expired token', 'warning')
@@ -448,16 +479,22 @@ def result(testId):
 
 @app.route("/dashboard",methods=['POST', 'GET'])
 @login_required
-
 def dashboard():
     if currentUserType.isStudent():
         code_form = CodeForm()
         if code_form.validate_on_submit():
             c = code_form.code.data
             t = Test.query.filter_by(code=c).first()
-            return redirect(url_for("test",testId=t.id))
+            if t:
+                return redirect(url_for("test",testId=t.id))
+            else:
+                flash('Enter a valid Test Code', 'error')
+        elif code_form.code.data:
+            flash('Enter a valid Test Code of 8 characters', 'warning')
         return render_template('studdash.html', title='Dashboard', form=code_form ,currentUserType = currentUserType)
-    else:
+    elif currentUserType.isTeacher():
         dat=Test.query.filter_by(teacher_id=current_user.id).all()
         print(dat)
         return render_template('teacher_dash.html', title='Dashboard',currentUserType = currentUserType,rows=dat)
+    else:
+        return redirect(url_for('home'))

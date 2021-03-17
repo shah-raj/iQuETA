@@ -1,7 +1,7 @@
 from datetime import datetime
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask_app import db, login_manager, app, currentUserType
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -94,7 +94,3 @@ class Marks(db.Model):
     def __repr__(self):
         return f"Question('{self.student_id}' - '{self.test_id}' - '{self.score}')"
 
-# db.create_all()
-# t1 = Teacher(username="ran",name="Rohini Nair",email="ran@somaiya.edu",password="password")
-# db.session.add(t1)
-# db.session.commiit()
