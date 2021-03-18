@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager,logout_user
@@ -45,25 +45,16 @@ consumer_key=GOOGLE_CLIENT_ID,
 consumer_secret=GOOGLE_CLIENT_SECRET)
 
 class userType:
-    def __init__(self,type=None):
-        self._type = type
-    
     def get_type(self):
-        return self._type
-    
-    def setTypeToTeacher(self):
-        self._type = "teacher"
-    
-    def setTypeToStudent(self):
-        self._type = "student"
+        return session['type']
     
     def isStudent(self):
-        if self._type == "student":
+        if session['type'] == "student":
             return True
         return False
     
     def isTeacher(self):
-        if self._type == "teacher":
+        if session['type'] == "teacher":
             return True
         return False
 

@@ -18,22 +18,10 @@ from flask_app.models import Test,Questions
 
 global_answers=list()
 
-def get_user():
-    type = request.cookies.get('userType')
-    return type
-
 @app.route("/")
 @app.route("/home", methods=['GET', 'POST'])
 def home():
-    # print(currentUserType.isStudent(),file=sys.stderr)
     if current_user.is_authenticated:
-        u = Teacher.query.filter_by(email=current_user.email).first()
-        if u:
-            currentUserType.setTypeToTeacher()
-        else:
-            u = Student.query.filter_by(email=current_user.email).first()
-            if u:
-                currentUserType.setTypeToStudent()
         return redirect(url_for('dashboard'))
     else:
         return render_template('home.html',currentUserType = currentUserType)
@@ -52,12 +40,7 @@ def create_test():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
-    userType = request.cookies.get('userType')
-    if userType:
-        if userType == 'student':
-            currentUserType.setTypeToStudent()
-        else:
-            currentUserType.setTypeToTeacher()
+    userType = session['type']
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     form = RegistrationForm()
@@ -71,34 +54,25 @@ def register():
         db.session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
         if currentUserType.isStudent():
-            return redirect(url_for('login'))
+            return redirect(url_for('slogin'))
         elif currentUserType.isTeacher():
-            return redirect(url_for('login'))
-    resp = make_response(render_template('register.html', title='Register', form=form,currentUserType = currentUserType))
-    if currentUserType.isStudent():
-        resp.set_cookie('userType','student')
-    elif currentUserType.isTeacher():
-        resp.set_cookie('userType','teacher')
-    return resp
+            return redirect(url_for('tlogin'))
+    return render_template('register.html', title='Register', form=form,currentUserType = currentUserType)
 
 @app.route("/slogin")
 def slogin():
-    currentUserType.setTypeToStudent()
+    session['type'] = 'student'
     return redirect(url_for('login'))
 
 @app.route("/tlogin")
 def tlogin():
-    currentUserType.setTypeToTeacher()
+    session['type'] = 'teacher'
     return redirect(url_for('login'))
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    userType = request.cookies.get('userType')
-    if userType:
-        if userType == 'student':
-            currentUserType.setTypeToStudent()
-        elif userType == 'teacher':
-            currentUserType.setTypeToTeacher()
+    userType = session['type']
+    print(userType,file=sys.stderr)
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
     form = LoginForm()
@@ -133,24 +107,18 @@ def login():
     if form.validate_on_submit():
         if currentUserType.isStudent():
             user = Student.query.filter_by(email=form.email.data).first()
-            currentUserType.setTypeToStudent()
+            session['type'] = 'student'
         elif currentUserType.isTeacher():
-            user = Teacher.query.filter_by(email=form.email.data).first()
-            currentUserType.setTypeToTeacher()   
+            user = Teacher.query.filter_by(email=form.email.data).first() 
+            session['type'] = 'teacher'
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             user.authenticated = True
-            # print(current_user,file=sys.stderr)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
-    resp = make_response(render_template('login.html', title='Login', form=form,currentUserType = currentUserType))
-    if currentUserType.isStudent():
-        resp.set_cookie('userType', 'student')
-    elif currentUserType.isTeacher():
-        resp.set_cookie('userType','teacher')
-    return resp
+    return render_template('login.html', title='Login', form=form,currentUserType = currentUserType)
 
 
 
@@ -165,7 +133,6 @@ def insert():
         session["subject"] = request.form['subject']
     else:
         session["subject"] = request.args.get['subject']
-    # print(session["filepath"])
 
     codd=''.join(random.choice(string.ascii_uppercase + string.ascii_uppercase + string.digits) for _ in range(8))
 
@@ -225,11 +192,6 @@ def up_question(id):
         k.append(int(i))
 
     print("These are selected:",k)
-    # m = i.split(", ")
-
-    # for j in i[0:len(i):2]:
-    #     print(j)
-    #     m.append(int(j))
     allqs=Questions.query.filter_by(test_id=id).with_entities(Questions.id).all()
     tot=[]
     for a in allqs:
@@ -246,14 +208,7 @@ def up_question(id):
         db.session.commit()
 
     flash("Questions updated Successfully")
-
-    
-
-    # res=Questions(question_text=q,test_id=i,ans=a,op1=o1,op2=o2,op3=o3,op4=o4)
-    # db.session.add(res)
-    # db.session.commit()
     return redirect(url_for('dashboard'))
-    # return redirect(url_for('dashboard'))
 
 
 
@@ -304,10 +259,6 @@ def viewqns(id):
     return render_template('viewqns.html', title='viewqns',currentUserType = currentUserType,rows=my_data,tid=id)
 
 
-
-
-
-
 @app.route('/googleLogin')
 def googleLogin():
     callback=url_for('authorized', _external=True)
@@ -330,6 +281,7 @@ def get_access_token():
 @app.route("/logout")
 def logout():
     logout_user()
+    session.pop('type',None)
     return redirect(url_for('home'))
 
 
@@ -426,7 +378,6 @@ def generate_test():
         session["subject"] = request.form['subject']
     else:
         session["subject"] = request.args.get['subject']
-    # print(session["filepath"])
 
     codd=''.join(random.choice(string.ascii_uppercase + string.ascii_uppercase + string.digits) for _ in range(8))
 
@@ -444,7 +395,6 @@ def generate_test():
     
     return render_template(
         "objective_test.html",
-        # username=session["username"],
         testname=session["subject"],
         question1=question_list[0],
         question2=question_list[1],
@@ -480,6 +430,7 @@ def result(testId):
 @app.route("/dashboard",methods=['POST', 'GET'])
 @login_required
 def dashboard():
+    print(currentUserType.get_type(),file=sys.stderr)
     if currentUserType.isStudent():
         code_form = CodeForm()
         if code_form.validate_on_submit():
