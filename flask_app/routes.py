@@ -12,6 +12,7 @@ from werkzeug.utils import secure_filename
 from flask_app.objective import ObjectiveTest
 import random
 from datetime import date, datetime
+from sqlalchemy import desc
 
 import string
 from flask_app.models import Test,Questions
@@ -72,7 +73,6 @@ def tlogin():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     userType = session['type']
-    print(userType,file=sys.stderr)
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
     form = LoginForm()
@@ -178,11 +178,8 @@ def add_question():
 
 @app.route('/up_question/<id>/', methods = ['POST','GET'])
 def up_question(id):
-    
     i=request.form['checkboxvalue']
-    print(i)
     m=list(i)
-    print(m)
     for i in m:
         if i==',':
             m.remove(',')
@@ -190,18 +187,14 @@ def up_question(id):
     k=[]
     for i in m:
         k.append(int(i))
-
-    print("These are selected:",k)
     allqs=Questions.query.filter_by(test_id=id).with_entities(Questions.id).all()
     tot=[]
     for a in allqs:
         tot.append(a[0])
-    print(tot)
     final=tot
     for i in k:
         if i in final:
             final.remove(i)
-    print(final)
     for i in final:
         my_data = Questions.query.get(i)
         db.session.delete(my_data)
@@ -269,7 +262,6 @@ def googleLogin():
 def authorized(resp):
     access_token = resp['access_token']
     session['access_token'] = access_token, ''
-    print(access_token)
     return redirect(url_for('home'))
 
 @google.tokengetter
@@ -427,10 +419,17 @@ def result(testId):
     prc = (r.score/t.max_score) * 100
     return render_template('result.html', percentage=prc, subject=t.subject ,currentUserType=currentUserType)
 
+@app.route("/solution/<int:testId>", methods=['GET'])
+def solution(testId):
+    r = Marks.query.filter_by(id=testId).first()
+    t = Test.query.filter_by(id=r.test_id).first()
+    prc = (r.score/t.max_score) * 100
+    return render_template('result.html', percentage=prc, subject=t.subject ,currentUserType=currentUserType)
+
+
 @app.route("/dashboard",methods=['POST', 'GET'])
 @login_required
 def dashboard():
-    print(currentUserType.get_type(),file=sys.stderr)
     if currentUserType.isStudent():
         code_form = CodeForm()
         if code_form.validate_on_submit():
@@ -442,10 +441,24 @@ def dashboard():
                 flash('Enter a valid Test Code', 'error')
         elif code_form.code.data:
             flash('Enter a valid Test Code of 8 characters', 'warning')
-        return render_template('studdash.html', title='Dashboard', form=code_form ,currentUserType = currentUserType)
+        dat=Marks.query.filter_by(student_id=current_user.id).order_by(desc(Marks.date_of_attempt)).all()
+        res = []
+        for row in dat:
+            temp = dict()
+            tempTest = Test.query.filter_by(id = row.test_id).first()
+            tempTeacher = Teacher.query.filter_by(id = tempTest.teacher_id).first()
+            temp['subject'] = tempTest.subject
+            temp['date'] = row.date_of_attempt
+            temp['score'] = row.score
+            temp['maxscore'] = tempTest.max_score
+            temp['teacher'] = tempTeacher.name
+            temp['code'] = tempTest.code
+            temp['id'] = row.id
+            temp['testId'] = temp.test_id
+            res.append(temp)
+        return render_template('student_dash.html', title='Dashboard', form=code_form ,currentUserType = currentUserType, rows=res)
     elif currentUserType.isTeacher():
         dat=Test.query.filter_by(teacher_id=current_user.id).all()
-        print(dat)
         return render_template('teacher_dash.html', title='Dashboard',currentUserType = currentUserType,rows=dat)
     else:
         return redirect(url_for('home'))

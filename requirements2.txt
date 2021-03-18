@@ -1,0 +1,13 @@
+bert-extractive-summarizer
+neuralcoref
+python -m spacy download en_core_web_md
+git+https://github.com/boudinfl/pke.git
+
+import nltk
+nltk.download('stopwords')
+nltk.download('popular')
+
+flashtext
+pywsd
+pip install -U wn==0.0.23
+torch
