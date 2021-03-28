@@ -1,23 +1,20 @@
-import os, secrets, json ,sys
+import os, secrets, json ,sys, random, string
 from PIL import Image
-from flask import render_template, url_for, flash, redirect, request, abort, jsonify, Flask, session, make_response
+from flask import *
 from flask_app import app, db, bcrypt, mail, google, REDIRECT_URI, currentUserType
 from flask_app.forms import *
-from flask_app.models import Teacher, Student, Questions, Test, Marks
+from flask_app.models import *
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 from urllib.request import Request, urlopen, URLError
 from urllib.parse import urlparse
 from werkzeug.utils import secure_filename
 from flask_app.objective import ObjectiveTest
-import random
 from datetime import date, datetime
 from sqlalchemy import desc
 
-import string
-from flask_app.models import Test,Questions
-
 global_answers=list()
+global_questions = list()
 
 @app.route("/")
 @app.route("/home", methods=['GET', 'POST'])
@@ -396,17 +393,29 @@ def generate_test():
 
 @app.route("/test/<int:testId>", methods=['POST', 'GET'])
 def test(testId):
+    global global_questions
     questions = Questions.query.filter_by(test_id=testId).all()
+    t = Test.query.filter_by(id=testId).first()
+    teach = Teacher.query.filter_by(id=t.teacher_id).first()
     if request.method == 'GET':
-        return render_template("test.html", data=questions, currentUserType=currentUserType)
+        if len(questions)>t.max_score:
+            questions = random.sample(questions,t.max_score)
+        random.shuffle(questions)
+        global_questions = questions
+        m = Marks.query.filter_by(student_id=current_user.id,test_id=testId).first()
+        if m:
+            return render_template("test.html", data=questions, currentUserType=currentUserType, restricted=True)
+        return render_template("test.html", data=questions, currentUserType=currentUserType, restricted=False, teacher=teach, subject = t.subject)
     else:
+        questions = global_questions
         result = 0
-        total = 0
-        for q in questions:
+        for q in questions:             
             selected = str(q.id)
-            if request.form[selected] == str(q.ans):
-                result += 1
-            total += 1
+            try:
+                if request.form[selected] == str(q.ans):
+                    result += 1
+            except:
+                pass
         m = Marks(test_id=testId,student_id=current_user.id, score=result,date_of_attempt=datetime.now())
         db.session.add(m)
         db.session.commit()
@@ -414,17 +423,29 @@ def test(testId):
 
 @app.route("/result/<int:testId>", methods=['POST', 'GET'])
 def result(testId):
-    r = Marks.query.filter_by(id=testId).first()
+    r = Marks.query.filter_by(test_id=testId,student_id=current_user.id).first()
     t = Test.query.filter_by(id=r.test_id).first()
-    prc = (r.score/t.max_score) * 100
+    prc = (r.score/t.max_score) * 100 
     return render_template('result.html', percentage=prc, subject=t.subject ,currentUserType=currentUserType)
+
+@app.template_filter('shuffle')
+def filter_shuffle(seq):
+    try:
+        result = list(seq)
+        random.shuffle(result)
+        return result
+    except:
+        return seq
 
 @app.route("/solution/<int:testId>", methods=['GET'])
 def solution(testId):
-    r = Marks.query.filter_by(id=testId).first()
+    r = Marks.query.filter_by(test_id=testId,student_id=current_user.id).first()
     t = Test.query.filter_by(id=r.test_id).first()
+    teach = Teacher.query.filter_by(id=t.teacher_id).first()
     prc = (r.score/t.max_score) * 100
-    return render_template('result.html', percentage=prc, subject=t.subject ,currentUserType=currentUserType)
+    questions = Questions.query.filter_by(test_id=testId).all()
+    random.shuffle(questions)
+    return render_template('view_test.html', percentage=prc, subject=t.subject ,currentUserType=currentUserType, data=questions, teacher = teach)
 
 
 @app.route("/dashboard",methods=['POST', 'GET'])
@@ -436,7 +457,11 @@ def dashboard():
             c = code_form.code.data
             t = Test.query.filter_by(code=c).first()
             if t:
-                return redirect(url_for("test",testId=t.id))
+                m = Marks.query.filter_by(student_id=current_user.id,test_id=t.id).first()
+                if m:
+                    flash('You have already attempted this test', 'error')
+                else:
+                    return redirect(url_for("test",testId=t.id))
             else:
                 flash('Enter a valid Test Code', 'error')
         elif code_form.code.data:
@@ -454,7 +479,7 @@ def dashboard():
             temp['teacher'] = tempTeacher.name
             temp['code'] = tempTest.code
             temp['id'] = row.id
-            temp['testId'] = temp.test_id
+            temp['testId'] = row.test_id
             res.append(temp)
         return render_template('student_dash.html', title='Dashboard', form=code_form ,currentUserType = currentUserType, rows=res)
     elif currentUserType.isTeacher():

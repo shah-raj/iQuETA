@@ -1,30 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box
-}
-
-
-
-.container {
-    background-color: #555;
-    color: #ddd;
+#quiz {
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;  
+    background-color: #F5F5F5;
+    color: #000;
     border-radius: 10px;
     padding: 20px;
+/*    font-family: 'Montserrat', sans-serif;*/
     max-width: 700px
 }
 
-.container>p {
+#quiz>p {
     font-size: 32px
 }
 
-.question {
+#question {
     width: 75%
 }
 
-.options {
+#optionsLabel {
     position: relative;
     padding-left: 40px
 }
@@ -36,26 +29,26 @@
     cursor: pointer
 }
 
-.options input {
+#optionsLabel input {
     opacity: 0
 }
 
-.checkmark {
+#radioButton {
     position: absolute;
     top: -1px;
     left: 0;
     height: 25px;
     width: 25px;
-    background-color: #555;
+    background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 50%
 }
 
-.options input:checked~.checkmark:after {
+#optionsLabel input:checked~#radioButton:after {
     display: block
 }
 
-.options .checkmark:after {
+#optionsLabel #radioButton:after {
     content: "";
     width: 10px;
     height: 10px;
@@ -69,33 +62,37 @@
     transition: 300ms ease-in-out 0s
 }
 
-.options input[type="radio"]:checked~.checkmark {
+#optionsLabel input[type="radio"]:checked~#radioButton {
     background: #21bf73;
     transition: 300ms ease-in-out 0s
 }
 
-.options input[type="radio"]:checked~.checkmark:after {
+#optionsLabel input[type="radio"]:checked~#radioButton:after {
     transform: translate(-50%, -50%) scale(1)
 }
 
-.btn-primary {
-    background-color: #555;
-    color: #ddd;
-    border: 1px solid #ddd
+
+.topright {
+    position: absolute;
+    top: 18px;
+    right: -400px;
+    font-size: 18px;
+    color:red;
 }
 
-.btn-primary:hover {
-    background-color: #21bf73;
-    border: 1px solid #21bf73
-}
-
-.btn-success {
-    padding: 5px 25px;
-    background-color: #21bf73
+.contt {
+    position: absolute;
+    top: 30spx;
+    right: -480px;
+    width: 330px;
+    height: 80px;
+    border: 3px solid #73AD21;
+    padding: 15px;
+    background:#ffff4d;
 }
 
 @media(max-width:576px) {
-    .question {
+    #question {
         width: 100%;
         word-spacing: 2px
     }

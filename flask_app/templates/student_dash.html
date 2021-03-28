@@ -1,109 +1,49 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
-
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
-    <link rel="stylesheet" type="text/css" href = "{{ url_for('static',filename='dashboard.css') }}">
-
-    {% if title %}
-        <title>iQuETA - {{ title }}</title>
-    {% else %}
-        <title>iQuETA</title>
-    {% endif %}
-
-<script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
-<script type="text/javascript" src="{{url_for('static',filename='js/jquery-3.2.1.min.js')}}"></script>
-<script type="text/javascript" src="{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
-
-</head>
-<body>
-  {% include "navbar.html" %}
-<main role="main" class="container">
-<div class="row">
-  <div class="col-md-12">
-    
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    {% for message in messages %}
-    <div class="alert alert-success alert-dismissable" role="alert">
-      <button type="button" class="close" data-dismiss="alert" aria-label="close">
-        <span aria-hidden="true">x</span>
-      </button>
-      {{message}}
-    </div>
-    
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
+{% extends "studentlayout.html" %}
+{% block studentcontent %}
 <h3>Created Tests</h3>
-
-      <table class="dataframe male">  
-      <thead>  
-
-          <th>ID</th>  
-          <th>Subject</th>  
-          <th>Teacher</th>
-          <th>Date</th> 
-          <th>Test Code</th>
-          <th>Score</th>
-          <th>View Test</th>
-      </thead>
-
-      {% for r in rows %} 
-          <tr>  
-              <td>{{loop.index}}</td>  
-              <td>{{r['subject']}}</td>
-              <td>{{r['teacher']}}</td>
-              <td>{{r['date'].strftime("%m/%d/%Y")}}</td>  
-              <td>{{r['code']}}</td>
-              <td>{{r['score']}}/{{r['maxscore']}}</td>     
-              <td><a href="url_for('solution',testId=r['testId'])"class="btn btn-outline-info">View Test</a></td>
-          </tr> 
-                      
-    {% endfor %}  
-</table> 
-
-
+<table class="dataframe male">
+  <thead>
+    <th>ID</th>
+    <th>Subject</th>
+    <th>Teacher</th>
+    <th>Date</th>
+    <th>Test Code</th>
+    <th>Score</th>
+    <th>View Test</th>
+  </thead>
+  {% for r in rows %} 
+  <tr>
+    <td>{{loop.index}}</td>
+    <td>{{r['subject']}}</td>
+    <td>{{r['teacher']}}</td>
+    <td>{{r['date'].strftime("%m/%d/%Y")}}</td>
+    <td>{{r['testId']}}</td>
+    <td>{{r['score']}}/{{r['maxscore']}}</td>
+    <td><a href="{{url_for('solution',testId=r['testId'])}}"class="btn btn-outline-info">View Test</a></td>
+  </tr>
+  {% endfor %}  
+</table>
 <!-- Enter Test Code-->                
- <div class="modal fade" id="enterTestCode" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="enterTestCode" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Enter Test Code</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
+        <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-          
-          <form method="POST" action="">
-              {{ form.hidden_tag() }}                    
-              <div class="form-outline">
-                  {{ form.code.label }}
-                  {{ form.code(class="form-control") }}
-                </div>
-                  {{ form.submit(class="btn btn-outline-dark") }}
-          </form>
+        <form method="POST" action="">
+          {{ form.hidden_tag() }}                    
+          <div class="form-outline">
+            {{ form.code.label }}
+            {{ form.code(class="form-control") }}
+          </div>
+          {{ form.submit(class="btn btn-outline-dark") }}
+        </form>
       </div>
-    
     </div>
   </div>
 </div>
-</div>
-</div>
-</main>
-</body>
-
-</html>
-
+{% endblock studentcontent %}

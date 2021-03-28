@@ -1,10 +1,10 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
-from wtforms import (StringField, PasswordField, SubmitField, 
-                    BooleanField, TextAreaField, Form, SelectField)
+from wtforms import *
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_app.models import Teacher, Student
+from flask import *
 
 class RegistrationForm(FlaskForm):
     name = StringField('Name',
@@ -68,4 +68,7 @@ class ResetPasswordForm(FlaskForm):
 
 class CodeForm(FlaskForm):
     code = StringField('Enter Code', validators=[DataRequired(),Length(min=8, max=8)])
+    submit = SubmitField('Submit')
+
+class QuizForm(FlaskForm):
     submit = SubmitField('Submit')
