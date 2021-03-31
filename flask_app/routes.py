@@ -184,15 +184,16 @@ def up_question(id):
     k=[]
     for i in m:
         k.append(int(i))
+    print(k)
     allqs=Questions.query.filter_by(test_id=id).with_entities(Questions.id).all()
     tot=[]
     for a in allqs:
         tot.append(a[0])
-    final=tot
+    final=tot.copy()
     for i in k:
         if i in final:
             final.remove(i)
-    for i in final:
+    for i in k:
         my_data = Questions.query.get(i)
         db.session.delete(my_data)
         db.session.commit()
