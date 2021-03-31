@@ -405,7 +405,7 @@ def test(testId):
         m = Marks.query.filter_by(student_id=current_user.id,test_id=testId).first()
         if m:
             return render_template("test.html", data=questions, currentUserType=currentUserType, restricted=True)
-        return render_template("test.html", data=questions, currentUserType=currentUserType, restricted=False, teacher=teach, subject = t.subject)
+        return render_template("test.html", data=questions, currentUserType=currentUserType, restricted=False, teacher=teach, subject = t.subject, duration=t.max_score*10)
     else:
         questions = global_questions
         result = 0
