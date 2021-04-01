@@ -176,23 +176,24 @@ def add_question():
 @app.route('/up_question/<id>/', methods = ['POST','GET'])
 def up_question(id):
     i=request.form['checkboxvalue']
-    m=list(i)
-    for i in m:
-        if i==',':
-            m.remove(',')
-            continue
-    k=[]
-    for i in m:
-        k.append(int(i))
+    k=list(map(int,i.split(',')))
+    # print(m)
+    # for i in m:
+    #     if i==',':
+    #         m.remove(',')
+    #         continue
+    # k=[]
+    # for i in m:
+    #     k.append(int(i))
     print(k)
     allqs=Questions.query.filter_by(test_id=id).with_entities(Questions.id).all()
     tot=[]
     for a in allqs:
         tot.append(a[0])
     final=tot.copy()
-    for i in k:
-        if i in final:
-            final.remove(i)
+    # for i in k:
+    #     if i in final:
+    #         final.remove(i)
     for i in k:
         my_data = Questions.query.get(i)
         db.session.delete(my_data)
@@ -230,7 +231,11 @@ def update():
 @app.route('/delete/<id>/', methods = ['GET', 'POST'])
 def delete(id):
     firstt=Questions.query.filter_by(test_id=id).all()
+    tests = Marks.query.filter_by(test_id=id).all()
     for x in firstt:
+        db.session.delete(x)
+        db.session.commit()
+    for x in tests:
         db.session.delete(x)
         db.session.commit()
     my_data = Test.query.get(id)
@@ -459,7 +464,9 @@ def dashboard():
             t = Test.query.filter_by(code=c).first()
             if t:
                 m = Marks.query.filter_by(student_id=current_user.id,test_id=t.id).first()
-                if m:
+                if t.status == 0:
+                    flash('Enter a valid Test Code', 'error')
+                elif m:
                     flash('You have already attempted this test', 'error')
                 else:
                     return redirect(url_for("test",testId=t.id))

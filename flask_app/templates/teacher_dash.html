@@ -43,6 +43,9 @@
                     {% endfor %}
                     {% endif %}
                     {% endwith %}
+                    {% if rows|length == 0 %}
+                    <h3>You have not created any tests!</h3>
+                    {% else %}
                     <h3>Created Tests</h3>
                     <table class="dataframe male">
                         <thead>
@@ -115,6 +118,7 @@
                         </div>
                         {% endfor %}  
                     </table>
+                    {% endif %}
                     <!-- Create New Test
                         -->                
                     <div id="createNewTestModal" class="modal fade" role="dialog">

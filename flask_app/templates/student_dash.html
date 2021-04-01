@@ -1,6 +1,9 @@
 {% extends "studentlayout.html" %}
 {% block studentcontent %}
-<h3>Created Tests</h3>
+{% if rows|length == 0 %}
+<h3>You have not attempted any tests</h3>
+{% else %}
+<h3>Attempted Tests</h3>
 <table class="dataframe male">
   <thead>
     <th>ID</th>
@@ -23,6 +26,7 @@
   </tr>
   {% endfor %}  
 </table>
+{% endif %}
 <!-- Enter Test Code-->                
 <div class="modal fade" id="enterTestCode" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -46,4 +50,5 @@
     </div>
   </div>
 </div>
+
 {% endblock studentcontent %}
