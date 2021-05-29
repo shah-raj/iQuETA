@@ -9,41 +9,47 @@
 
 @font-face {
   font-family: Poppins-Regular;
-  src: url('../fonts/poppins/Poppins-Regular.ttf'); 
+  src: url('../fonts/poppins/Poppins-Regular.ttf');
 }
 
 @font-face {
   font-family: Poppins-Medium;
-  src: url('../fonts/poppins/Poppins-Medium.ttf'); 
+  src: url('../fonts/poppins/Poppins-Medium.ttf');
 }
 
 @font-face {
   font-family: Poppins-Bold;
-  src: url('../fonts/poppins/Poppins-Bold.ttf'); 
+  src: url('../fonts/poppins/Poppins-Bold.ttf');
 }
 
 @font-face {
   font-family: Poppins-SemiBold;
-  src: url('../fonts/poppins/Poppins-SemiBold.ttf'); 
+  src: url('../fonts/poppins/Poppins-SemiBold.ttf');
+}
+
+@font-face{
+    font-family: "Roboto";
+    src: url("../fonts/Roboto_Mono/RobotoMono-Light.ttf")
 }
 
 /*//////////////////////////////////////////////////////////////////
 [ RESTYLE TAG ]*/
 
 * {
-	margin: 0px; 
-	padding: 0px; 
+	margin: 0px;
+	padding: 0px;
 	box-sizing: border-box;
 }
 
 body, html {
 	height: 100%;
-	font-family: Poppins-Regular, sans-serif;
+	font-family: "Roboto";
 }
+
 
 /*---------------------------------------------*/
 a {
-	font-family: Poppins-Regular;
+	font-family: "Roboto";
 	font-size: 14px;
 	line-height: 1.7;
 	color: #666666;
@@ -69,7 +75,7 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 p {
-	font-family: Poppins-Regular;
+	font-family: "Roboto";
 	font-size: 14px;
 	line-height: 1.7;
 	color: #666666;
@@ -152,7 +158,7 @@ iframe {
 /*//////////////////////////////////////////////////////////////////
 [ Utility ]*/
 .txt1 {
-  font-family: Poppins-Regular;
+  font-family: "Roboto";
   font-size: 13px;
   line-height: 1.4;
   color: #999999;
@@ -167,7 +173,7 @@ iframe {
 }
 
 .container-login100 {
-  width: 100%;  
+  width: 100%;
   min-height: 100vh;
   display: -webkit-box;
   display: -webkit-flex;
@@ -213,7 +219,7 @@ iframe {
 }
 
 .login100-form-title-1 {
-  font-family: Poppins-Bold;
+  font-family: "Roboto";
   font-size: 30px;
   color: #fff;
   text-transform: uppercase;
@@ -260,7 +266,7 @@ iframe {
 }
 
 .label-input100 {
-  font-family: Poppins-Regular;
+  font-family: "Roboto";
   font-size: 15px;
   color: #808080;
   line-height: 1.2;
@@ -275,7 +281,7 @@ iframe {
 
 /*---------------------------------------------*/
 .input100 {
-  font-family: Poppins-Regular;
+  font-family: "Roboto";
   font-size: 15px;
   color: #555555;
   line-height: 1.2;
@@ -336,7 +342,7 @@ input.input100 {
 }
 
 .label-checkbox100 {
-  font-family: Poppins-Regular;
+  font-family: "Roboto";
   font-size: 13px;
   color: #999999;
   line-height: 1.4;
@@ -349,7 +355,7 @@ input.input100 {
 
 .label-checkbox100::before {
   content: "\f00c";
-  font-family: FontAwesome;
+  font-family: "Roboto";
   font-size: 13px;
   color: transparent;
 
@@ -405,7 +411,7 @@ input.input100 {
   background-color: #57b846;
   border-radius: 25px;
 
-  font-family: Poppins-Regular;
+  font-family: "Roboto";
   font-size: 16px;
   color: #fff;
   line-height: 1.2;
@@ -470,7 +476,7 @@ input.input100 {
   right: 2px;
   pointer-events: none;
 
-  font-family: Poppins-Medium;
+  font-family: "Font";
   color: #c80000;
   font-size: 13px;
   line-height: 1.4;
@@ -487,7 +493,7 @@ input.input100 {
 
 .alert-validate::after {
   content: "\f06a";
-  font-family: FontAwesome;
+  font-family: "Font";
   display: block;
   position: absolute;
   color: #c80000;
@@ -512,5 +518,3 @@ input.input100 {
     opacity: 1;
   }
 }
-
-

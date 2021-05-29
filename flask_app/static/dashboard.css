@@ -14,12 +14,12 @@ table.dataframe, .dataframe th, .dataframe td {
 
       }
 
-  tr:nth-child(odd)   
+  tr:nth-child(odd)
   { background-color:#fff; }
-  tr:nth-child(even)  
+  tr:nth-child(even)
   { background-color:#fff; }
 
-  tr:hover            
+  tr:hover
   { background-color: #eee;}
 
 

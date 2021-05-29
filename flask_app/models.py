@@ -18,7 +18,7 @@ class Teacher(db.Model, UserMixin):
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     password = db.Column(db.String(60), nullable=False)
     tests = db.relationship('Test', backref='teacher', lazy=True)
-
+    # Teacher(name='raj',email='r@r.r',password='aa')
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)
         return s.dumps({'user_id': self.id}).decode('utf-8')
@@ -63,12 +63,13 @@ class Student(db.Model, UserMixin):
 class Test(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.String(100), nullable=False)
-    date_created = db.Column(db.Date, nullable=False, default=datetime.utcnow)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'), nullable=False)
     code = db.Column(db.String(8),nullable = False)
     status = db.Column(db.Boolean,nullable = False)
     questions = db.relationship('Questions', backref='test', lazy=True)
-    max_score = db.Column(db.Integer)
+    tot_questions = db.Column(db.Integer) #new
+    tot_time = db.Column(db.Integer) #new
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow) #modified
     # marks = db.relationship('Marks', backref='test', lazy=True)
     def __repr__(self):
         return f"Test('{self.subject}' - '{self.date_created}')"
@@ -81,7 +82,7 @@ class Questions(db.Model):
     op1 = db.Column(db.String(200))
     op2 = db.Column(db.String(200))
     op3 = db.Column(db.String(200))
-    op4 = db.Column(db.String(200))
+    # op4 = db.Column(db.String(200)) #removed
     def __repr__(self):
         return f"Question('{self.question_text}' - '{self.ans}')"
 
@@ -92,5 +93,13 @@ class Marks(db.Model):
     score = db.Column(db.Integer,nullable=False)
     date_of_attempt = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     def __repr__(self):
-        return f"Question('{self.student_id}' - '{self.test_id}' - '{self.score}')"
+        return f"Marks('{self.student_id}' - '{self.test_id}' = '{self.score}')"
 
+class Answers(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    marks_id = db.Column(db.Integer, db.ForeignKey('marks.id'), nullable=False)
+    q_id = db.Column(db.Integer, db.ForeignKey('questions.id'), nullable=False)
+    student_ans = db.Column(db.String(200))
+    right_ans = db.Column(db.Boolean,nullable = False)
+    def __repr__(self):
+        return f"Answers('{self.makrs_id}' - '{self.q_id}' - '{self.right_ans}')"

@@ -1,66 +1,92 @@
-{% extends "layout.html" %}
-{% block content %}
-    <div class="content-section">
-        <form method="POST" action="">
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/animate/animate.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/daterangepicker/daterangepicker.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='loginutil.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='loginmain.css') }}">
+  </head>
+  <a href="{{ url_for('home') }}" style="text-align: center;">
+    <h3><br>iQuETA</h3>
+  </a>
+  <br>
+  <body scroll="no" style="overflow: hidden">
+    <div class="limiter">
+      <div class="container-login100" >
+        <div class="wrap-login100" style="position: relative; top: -50px;">
+          <div class="login100-form-title" style="background-image: url('../static/img/bg-01.jpg')">
+            <span class="login100-form-title-1">
+            Sign In
+            </span>
+          </div>
+          <form class="login100-form validate-form" method="POST" action="">
             {{ form.hidden_tag() }}
-            <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Log In</legend>
-                <div class="form-group">
-                    {{ form.email.label(class="form-control-label") }}
-                    {% if form.email.errors %}
-                        {{ form.email(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.email.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.email(class="form-control form-control-lg") }}
-                    {% endif %}
+            <div class="wrap-input100 validate-input m-b-26" data-validate="Username is required">
+              <span class="label-input100">
+                <h5>Email</h5>
+              </span>
+              {% if form.email.errors %}
+                {{ form.email(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for error in form.email.errors %}
+                    <span>{{ error }}</span>
+                  {% endfor %}
                 </div>
-                <div class="form-group">
-                    {{ form.password.label(class="form-control-label") }}
-                    {% if form.password.errors %}
-                        {{ form.password(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.password.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.password(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-                <div class="form-check">
-                    {{ form.show_password(class="form-check-input") }}
-                    {{ form.show_password.label(class="form-check-label") }}
-                </div>
-            </fieldset>
-            <div class="form-group">
-                {{ form.submit(class="btn btn-outline-info") }}
-                {{ form.google(class="btn btn-outline-info") }}
-                <small class="text-muted ml-2">
-                    <a href="{{ url_for('reset_request') }}">Forgot Password?</a>
-                </small>
+              {% else %}
+                {{ form.email(class="form-control form-control-lg") }}
+              {% endif %}
+              <span class="focus-input100"></span>
             </div>
-        </form>
+            <div class="wrap-input100 validate-input m-b-18" data-validate = "Password is required">
+              <span class="label-input100">
+                <h5>Password</h5>
+              </span>
+              {% if form.password.errors %}
+                {{ form.password(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for error in form.password.errors %}
+                    <span>{{ error }}</span>
+                  {% endfor %}
+                </div>
+              {% else %}
+                {{ form.password(class="form-control form-control-lg") }}
+              {% endif %}
+            </div>
+            <div class="contact100-form-checkbox">
+            </div>
+            <div>
+              <a href="{{ url_for('reset_request') }}">
+                <h5>Forgot Password?</h5>
+              </a>
+            </div>
+            <div class="flex-sb-m w-full p-b-30" style="margin-top: 30px;">
+              <div class="container-login100-form-btn">
+                <button class="btn btn-outline-dark" style="width: 200px; height: 45px; position: absolute; left: 250px;">Login</button>
+              </div>
+            </div>
+            <div style="padding-left: 55px; margin-top: 30px;">
+              <small class="text-muted">
+                <h6>
+                  Need An Account? <a class="ml-2" href="{{ url_for('register') }}" style="font-size:18px;">Sign Up Now</a>
+                </h6>
+              </small>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-    <div class="border-top pt-3">
-        <small class="text-muted">
-            Need An Account? <a class="ml-2" href="{{ url_for('register') }}">Sign Up Now</a>
-        </small>
-    </div>
-    <script type="text/javascript">
-        window.addEventListener("load", function(){
-            var checkbox  = document.getElementById('{{form.show_password.id}}');
-            var x = document.getElementById('{{form.password.id}}');
-            checkbox.addEventListener('change', function() {
-                if(this.checked) {
-                    x.type = 'text'; 
-                } else {
-                    x.type = 'password'; 
-                }
-            });
-        });
-    </script>
-{% endblock content %}
+    <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+    <script src="vendor/animsition/js/animsition.min.js"></script>
+    <script src="vendor/bootstrap/js/popper.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="vendor/select2/select2.min.js"></script>
+    <script src="vendor/daterangepicker/moment.min.js"></script>
+    <script src="vendor/daterangepicker/daterangepicker.js"></script>
+    <script src="vendor/countdowntime/countdowntime.js"></script>
+    <script src="js/main.js"></script>
+  </body>

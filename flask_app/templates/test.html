@@ -7,12 +7,12 @@
         $('#restricted').modal('show');
       });
     </script>
+
     <div class="modal fade" id="restricted" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Restricted</h5>
-            </button>
           </div>
           <div class="modal-body">
             <span>You have already sumitted this test, to go back click <a href="{{url_for('dashboard')}}">here</a></span>
@@ -30,14 +30,14 @@
         <div class="container mt-sm-5 my-1" id="quiz">
           <div class="question ml-sm-5 pl-sm-5 pt-2" id = "question">
             <div class="py-2 h5"><b>Q.{{loop.index}} {{question.question_text}}</b></div>
-            {% set options = [question.op1,question.op2,question.op3,question.op4] %}
+            {% set options = [question.op1,question.op2,question.op3,question.ans] %}
             {% for op in options|shuffle %}
               <div class="ml-md-3 ml-sm-3 pt-sm-0 pt-3" id="options">
                 <label class="options" id = "optionsLabel">
                 {{op}}
-                <input type="radio"id="{{ op }}" name="{{ question.id }}" value="{{ op }}"> 
-                <span class="checkmark" id = "radioButton"></span> 
-                </label> 
+                <input type="radio"id="{{ op }}" name="{{ question.id }}" value="{{ op }}">
+                <span class="checkmark" id = "radioButton"></span>
+                </label>
               </div>
             {% endfor %}
           </div>
@@ -52,12 +52,11 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Time Up!</h5>
-            </button>
           </div>
           <div class="modal-body">
             <span>You have exceeded the time limit. To see you result click <a href="#" onclick="SubmitFunction()">here</a></span>
           </div>
-          
+
         </div>
       </div>
     </div>
@@ -88,7 +87,19 @@
       // alert("You're out of time!");
       document.getElementById("Submit").click();
     }
-    
+
   </script>
-  
+  <script>
+var elem = document.getElementById("fulls");
+function openFullscreen() {
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) { /* Safari */
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) { /* IE11 */
+    elem.msRequestFullscreen();
+  }
+}
+</script>
+
 {% endblock studentcontent %}

@@ -1,6 +1,6 @@
 
 #quiz {
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;  
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     background-color: #F5F5F5;
     color: #000;
     border-radius: 10px;
@@ -62,14 +62,23 @@
     transition: 300ms ease-in-out 0s
 }
 
+/* #optionsLabel input[type="radio"]:checked~span["name":"red"] {
+    background: #e02012;
+    transition: 300ms ease-in-out 0s
+} */
+
+
 #optionsLabel input[type="radio"]:checked~#radioButton {
     background: #21bf73;
     transition: 300ms ease-in-out 0s
 }
 
+
 #optionsLabel input[type="radio"]:checked~#radioButton:after {
     transform: translate(-50%, -50%) scale(1)
 }
+
+
 
 
 .topright {
@@ -90,6 +99,9 @@
     padding: 15px;
     background:#ffff4d;
 }
+
+
+
 
 @media(max-width:576px) {
     #question {

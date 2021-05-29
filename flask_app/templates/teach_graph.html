@@ -1,0 +1,114 @@
+<title>iQuETA - {{ title }}</title>
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <style>
+    table.dataframe, .dataframe th, .dataframe td {
+      border: none;
+      border-bottom: 1px solid #C8C8C8;
+      border-collapse: collapse;
+      text-align:center;
+      padding: 10px;
+      margin-bottom: 40px;
+      font-size: 0.95em;
+    }
+    .male th {
+      background-color: #000000;
+      color: white;
+    }
+    #tblStocks {
+      font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    #tblStocks td, #tblStocks th {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    #tblStocks tr:nth-child(even){background-color: #f2f2f2;}
+    #tblStocks tr:hover {background-color: #ddd;}
+    #tblStocks th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-align: left;
+      background-color: #294c67;;
+      color: white;
+    }
+  </style>
+  <script type="text/javascript" src="{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
+</head>
+<div class="row">
+  <div class="col-md-12">
+    <table id="tblStocks">
+      <p align="center"><h2>Students' Marks</h2></p>
+      <thead>
+        <th>SrNo</th>
+        <th>Student Id</th>
+        <th>Student Name</th>
+        <th>Score</th>
+        <th>Out Of</th>
+        <th>Date</th>
+      </thead>
+      {% for r in rows %}
+        <tr>
+          <td>{{loop.index}}</td>
+          <td>{{r['student_id']}}</td>
+          <td>{{r['name']}}</td>
+          <td>{{r['score']}}</td>
+          <td>{{r['out_of']}}</td>
+          <td>{{r['date'].strftime("%m/%d/%Y")}}</td>
+        </tr>
+      {% endfor %}
+    </table>
+    <br>
+    <button onclick="exportData()">
+    <span class="glyphicon glyphicon-download"></span>
+    Download list
+    </button>
+  </div>
+</div>
+<script>
+  function exportData(){
+
+  var table = document.getElementById("tblStocks");
+  var rows =[];
+
+  for(var i=0,row; row = table.rows[i];i++){
+
+    column1 = row.cells[0].innerText;
+    column2 = row.cells[1].innerText;
+    column3 = row.cells[2].innerText;
+    column4 = row.cells[3].innerText;
+    column5 = row.cells[4].innerText;
+    column6 = row.cells[5].innerText;
+
+
+  /* add a new records in the array */
+    rows.push(
+        [
+            column1,
+            column2,
+            column3,
+            column4,
+            column5,
+            column6
+        ]
+    );
+
+    }
+    csvContent = "data:text/csv;charset=utf-8,";
+
+    rows.forEach(function(rowArray){
+        row = rowArray.join(",");
+        csvContent += row + "\r\n";
+    });
+
+
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download",'{{filename | safe}}');
+    document.body.appendChild(link);
+     
+    link.click();
+  }
+</script>

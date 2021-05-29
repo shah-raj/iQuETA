@@ -1,10 +1,11 @@
 {% extends "studentlayout.html" %}
 {% block studentcontent %}
 {% if rows|length == 0 %}
+
 <h3>You have not attempted any tests</h3>
 {% else %}
-<h3>Attempted Tests</h3>
-<table class="dataframe male">
+<br>
+<table id="tblStocks">
   <thead>
     <th>ID</th>
     <th>Subject</th>
@@ -13,21 +14,23 @@
     <th>Test Code</th>
     <th>Score</th>
     <th>View Test</th>
+    <th>Statistics</th>
   </thead>
-  {% for r in rows %} 
+  {% for r in rows %}
   <tr>
     <td>{{loop.index}}</td>
     <td>{{r['subject']}}</td>
     <td>{{r['teacher']}}</td>
-    <td>{{r['date'].strftime("%m/%d/%Y")}}</td>
-    <td>{{r['testId']}}</td>
-    <td>{{r['score']}}/{{r['maxscore']}}</td>
+    <td>{{r['date']}}</td>
+    <td>{{r['code']}}</td>
+    <td>{{r['score']}}/{{r['tot_questions']}}</td>
     <td><a href="{{url_for('solution',testId=r['testId'])}}"class="btn btn-outline-info">View Test</a></td>
+    <td><a href="{{url_for('graph',testId=r['testId'])}}"class="btn btn-outline-info">Statistics</a></td>
   </tr>
-  {% endfor %}  
+  {% endfor %}
 </table>
 {% endif %}
-<!-- Enter Test Code-->                
+<!-- Enter Test Code-->
 <div class="modal fade" id="enterTestCode" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -39,7 +42,7 @@
       </div>
       <div class="modal-body">
         <form method="POST" action="">
-          {{ form.hidden_tag() }}                    
+          {{ form.hidden_tag() }}
           <div class="form-outline">
             {{ form.code.label }}
             {{ form.code(class="form-control") }}

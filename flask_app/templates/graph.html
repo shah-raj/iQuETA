@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en"›
+  <head>
+    <meta charset="UTF-8">
+    <title>iQuETA - {{ title }}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    <style>
+      #tblStocks {
+      font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+      }
+      #tblStocks td, #tblStocks th {
+      border: 1px solid #ddd;
+      padding: 8px;
+      }
+      #tblStocks tr:nth-child(even){background-color: #f2f2f2;}
+      #tblStocks tr:hover {background-color: #ddd;}
+      #tblStocks th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      background-color: #294c67;;
+      color: white;
+      }
+    </style>
+  </head>
+  {% include "navbar.html" %}
+  <body>
+    <div class="row">
+      <div class="col-md-5">
+        <canvas id="pieChart" width="650" height="400"></canvas>
+      </div>
+      <div class="col-md-7">
+        <canvas id="barChart2" width="800" height="400"></canvas>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-5">
+        <p >
+        <h2 class="d-flex justify-content-center">Answer Bifurcation</h2>
+        </p>
+      </div>
+      <div class="col-md-7">
+        <p >
+        <h2 class="d-flex justify-content-center">Comparative Score Analysis</h2>
+        </p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3"></div>
+      <div class="col-md-6">
+        <table id="tblStocks">
+          <hr>
+          <p >
+          <h2 class="d-flex justify-content-center">Leaderboard</h2>
+          </p>
+          <thead>
+            <th>SrNo</th>
+            <th>Student Id</th>
+            <th>Student Name</th>
+            <th>Score</th>
+            <th>Date</th>
+          </thead>
+          {% for r in rows %}
+            <tr>
+              <td>{{loop.index}}</td>
+              <td>{{r['student_id']}}</td>
+              <td>{{r['name']}}</td>
+              <td>{{r['score']}}</td>
+              <td>{{r['date'].strftime("%m/%d/%Y")}}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+    <script>
+    var dtx = document.getElementById("pieChart").getContext("2d");
+ 	var pieChart = new Chart(dtx, {
+ 	 type: "pie",
+ 	 data: {
+ 	 	labels: ['Correct','Incorrect','Unanswered'],
+ 	 	datasets: [
+{
+			label: "Marks",
+			data:[70,25,5],
+			backgroundColor: [
+               "#FF6384",
+            "#4BC0C0",
+            "#FFCE56"
+            ]
+
+			}
+			]
+		},
+		options: {
+        title: {
+            display: true,
+            text: 'Pie Chart'
+        },
+		responsive: true,
+maintainAspectRatio: false,
+    }
+});
+
+
+
+var dtx = document.getElementById("barChart2").getContext("2d");
+ 	var barChart2 = new Chart(dtx, {
+ 	 type: "bar",
+ 	 data: {
+ 	 	labels: {{ plot_three_labels | safe }},
+ 	 	datasets: [
+{
+			label: "Marks",
+			data:{{ three_values | safe }},
+			fill: false,
+			borderColor: "rgb(75, 192, 192)",
+			backgroundColor: "#4BC0C0",
+			lineTension: 0.1
+			}
+			]
+		},
+	options:{
+ responsive: false
+}
+});
+      var dtx = document.getElementById("pieChart").getContext("2d");
+      var pieChart = new Chart(dtx, {
+      type: "pie",
+      data: {
+        labels: ['Correct', 'Incorrect', 'Unanswered'],
+        datasets: [{
+          label: "Marks",
+          data: [{{stats['right']}}, {{stats['wrong']}},{{stats['unattempted']}}],
+          backgroundColor: [
+            "#FF6384",
+            "#4BC0C0",
+            "#FFCE56"
+          ]
+
+        }]
+      },
+      options: {
+        title: {
+          display: true,
+          text: 'Pie Chart'
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+      }
+      });
+
+
+
+      var dtx = document.getElementById("barChart2").getContext("2d");
+      var barChart2 = new Chart(dtx, {
+      type: "bar",
+      data: {
+        labels: {{plot_three_labels | safe}},
+        datasets: [{
+          label: "Marks",
+          data: {{three_values | safe}},
+          fill: false,
+          borderColor: "rgb(75, 192, 192)",
+          backgroundColor: "#4BC0C0",
+          lineTension: 0.1
+        }]
+      },
+      options: {
+        responsive: false
+      }
+      });
+
+    </script>
+    <script>
+      var elmnt = document.getElementById("testCode");
+      elmnt.remove();
+    </script>
+  </body>
+</html>

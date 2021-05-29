@@ -2,26 +2,41 @@
 {% block studentcontent %}
 <div class="py-2 h5"><b>Teacher: {{ teacher.name }}</b></div>
 <div class="py-2 h5"><b>Subject: {{ subject }}</b></div>
-<div class="py-2 h5"><b>Your Score: {{ percentage }}</b></div>
+<div class="py-2 h5"><b>Your Score: {{ percentage }}%</b></div>
 {% for question in data %}
 <div class="container mt-sm-5 my-1" id="quiz">
   <div class="question ml-sm-5 pl-sm-5 pt-2" id = "question">
-    <div class="py-2 h5"><b>Q.{{loop.index}} {{question.question_text}}</b></div>
-    {% set options = [question.op1,question.op2,question.op3,question.op4] %}
+    <div class="py-2 h5">
+      {% if question.student_ans|string == '' %}
+        <div class = "float-right"><span style="color:red;align:right"><b>Unattempted</b></span></div><br>
+      {% elif question.right_ans == 0 %}
+        <div class = "float-right"><span style="color:red;align:right"><b>Incorrect</b></span></div><br>
+      {% elif question.right_ans == 1 %}
+        <div class = "float-right"><span style="color:green;align:right"><b>Correct</b></span></div><br>
+      {% endif %}
+      <br>
+      <b>Q.{{loop.index}} {{question['question_text']}}</b>
+    </div>
+    {% set options = [question['op1'],question['op2'],question['op3'],question['ans']] %}
     {% for op in options|shuffle %}
-    
     <div class="ml-md-3 ml-sm-3 pt-sm-0 pt-3" id="options">
       <label class="options" id = "optionsLabel">
-      
-      {% if op==question.ans %}
-      <b>{{op}}</b>
-        <input type="radio"id="{{ op }}" name="{{ op }}" value="{{ op }}" checked> 
-    {% else %}
-    {{op}}
-    <input type="radio"id="{{ op }}" name="{{ op }}" value="{{ op }}" disabled>
-    {% endif %} 
-      <span class="checkmark" id = "radioButton"></span> 
-      </label> 
+          {% if op==question['ans'] %}
+          <span style="color:#21bf73"><b>{{op}}</b></span>
+
+            <input type="radio"id="{{ op }}" name="{{ op }}" value="{{ op }}" checked>
+            <span class="checkmark" id = "radioButton"></span>
+          {% elif op==question['student_ans'] %}
+            <span style="color:red"><b>{{op}}</b></span>
+
+            <input type="radio"id="{{ op }}" name="{{ op }}" value="{{ op }}" disabled>
+            <span class="checkmark" id = "radioButton" name="red"</span>
+          {% else %}
+            {{op}}
+            <input type="radio"id="{{ op }}" name="{{ op }}" value="{{ op }}" disabled>
+            <span class="checkmark" id = "radioButton"></span>
+          {% endif %}
+      </label>
     </div>
     {% endfor %}
   </div>

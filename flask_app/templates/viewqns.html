@@ -40,15 +40,13 @@
 
           }
 
-      tr:nth-child(odd)   
+      tr:nth-child(odd)
       { background-color:#fff; }
-      tr:nth-child(even)  
+      tr:nth-child(even)
       { background-color:#fff; }
 
-      tr:hover            
+      tr:hover
       { background-color: #eee;}
-
-
 
       .onoff{
         height: 20px;
@@ -79,81 +77,146 @@
         border-left: 30px solid #ddd;
         cursor: pointer;
       }
+
+      .get_value {
+  appearance: none;
+  position: absolute;
+  left:4%;
+  background-color: #F44336;
+  width:25px;
+  height:25px;
+  border-radius:20px;
+  margin:0px;
+  outline: none;
+  transition:background-color .5s;
+}
+.get_value:before {
+  content:'';
+  position: absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) rotate(45deg);
+  background-color:#ffffff;
+  width:20px;
+  height:5px;
+  border-radius:40px;
+  transition:all .5s;
+}
+
+.get_value:after {
+  content:'';
+  position: absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) rotate(-45deg);
+  background-color:#ffffff;
+  width:20px;
+  height:5px;
+  border-radius:40px;
+  transition:all .5s;
+}
+.get_value:checked {
+  background-color:#4CAF50;
+}
+.get_value:checked:before {
+  content:'';
+  position: absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) translate(-4px,3px) rotate(45deg);
+  background-color:#ffffff;
+  width:12px;
+  height:5px;
+  border-radius:40px;
+}
+
+.get_value:checked:after {
+  content:'';
+  position: absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) translate(3px,2px) rotate(-45deg);
+  background-color:#ffffff;
+  width:16px;
+  height:5px;
+  border-radius:40px;
+}
+
     </style>
     <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/jquery-3.2.1.min.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
-    
+
 </head>
 <body>
-   <a href="/dashboard" class="btn btn-outline-info">< Back</a>
+   <a href="/dashboard" class="btn btn-outline-info"> Back</a>
 <a href="/add_question/{{tid}}" class="btn btn-outline-info float-right" data-toggle="modal" data-target="#questionedit{{tid}}">Add Question</a><br><br>
 
-	<table class="dataframe male">  
-   <thead>  
+	<table class="dataframe male">
+   <thead>
       <th>Select</th>
-      <th>ID</th>  
-      <th>Test ID</th>
-      <th>Question</th>  
-      <th>Answer</th> 
-      <th>Option1</th>                      
+      <th>ID</th>
+      <th>Question</th>
+      <th>Answer</th>
+      <th>Option1</th>
       <th>Option2</th>
       <th>Option3</th>
-      <th>Option4</th>    
    </thead>
-   {% for r in rows %} 
-      <tr>  
-         <td><input type=checkbox class="get_value" name={{r.id}} value={{r.id}}><br/></td>
-         <td>{{r.id}}</td>  
-         <td>{{r.test_id}}</td>
+   {% for r in rows %}
+      <tr>
+          {% if r.op1 == "" or r.op2 == "" or r.op3 == "" %}
+            <td><input type=checkbox class="get_value" name={{r.id}} value={{r.id}} unchecked><br/></td>
+          {% else %}
+            <td><input type=checkbox class="get_value" name={{r.id}} value={{r.id}} checked><br/></td>
+          {% endif %}
+         <td>{{loop.index}}</td>
          <td>{{r.question_text}}</td>
-         
+
          <td>{{r.ans}}</td>
          <td>{{r.op1}}</td>
          <td>{{r.op2}}</td>
          <td>{{r.op3}}</td>
-         <td>{{r.op4}}</td>
          {% endfor%}
       </tr>
    <div id="questionedit{{tid}}" class="modal fade" role="dialog" tabindex="-1">
    <div class="modal-dialog" role="document">
       <div class="modal-content">
          <div class="modal-header">
- 
+
             <h4 class="modal-title">Add question</h4>
          </div>
          <div class="modal-body form-horizontal">
- 
+
             <form class="contact1-form validate-form form-horizontal" action="{{url_for('add_question')}}" method="POST" enctype="multipart/form-data" method="POST">
                <div class="form-group">
                   <label>Question</label>
                   <div class="col-xs-10">
                   <input type="hidden"  name="test_id" value="{{tid}}">
 
-                  <input type="text" class="form-control" name="question_text">   
+                  <input type="text" class="form-control" name="question_text">
                   </div>
                </div>
                <div class="form-group">
- 
+
                    <label>Answer</label>
-                  <input type="text" class="form-control" name="ans">                 
+                  <input type="text" class="form-control" name="ans">
                </div>
                 <div class="form-group">
-                  <label>Option1</label>
+                  <label>Option 1</label>
                   <input type="text" class="form-control" name="op1">
                </div>
                <div class="form-group">
-                  <label>Option2</label>
+                  <label>Option 2</label>
                   <input type="text" class="form-control" name="op2">
                </div>
                <div class="form-group">
-                  <label>Option3</label>
+                  <label>Option 3</label>
                   <input type="text" class="form-control" name="op3">
                </div>
-               <div class="form-group">
+               <!-- <div class="form-group">
                   <label>Option4</label>
                   <input type="text" class="form-control" name="op4">
-               </div>
+               </div> -->
                <div class="form-group">
                   <button class="btn btn-outline-info" type="submit">Add</button>
                </div>
@@ -177,20 +240,25 @@
                         insert.push($(this).val());
                     }
                 });
-                insert = insert.toString();			
-				var insert_string = 'checkboxvalue='+insert;			
+                insert = insert.toString();
+				var insert_string = 'checkboxvalue='+insert;
 				$.ajax({
 					method: "POST",
 					url: "/up_question/{{tid}}/",
 					data: insert_string,
 					cache: false,
-					success: function(data){    
+					success: function(data){
 						$("body").html(data);
 					}
 				});
             });
         });
-    </script>           
+    </script>
+    <script>
+    setTimeout(checkedbox, 1000);
+setTimeout(uncheckedbox, 2000);
+}
+    </script>
     <button type="button" class="btn btn-info float-right" name="upquestions" id="upquestions">Update</button>
 </body>
 {% endblock content %}
