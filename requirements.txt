@@ -9,3 +9,10 @@ Pillow
 python-decouple	
 git+https://github.com/mitsuhiko/flask-oauth
 email_validator
+bert-extractive-summarizer
+neuralcoref
+git+https://github.com/boudinfl/pke.git
+flashtext
+pywsd
+-U wn==0.0.23
+torch

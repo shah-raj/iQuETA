@@ -24,10 +24,6 @@ def home():
     else:
         return render_template('home.html',currentUserType = currentUserType)
 
-@app.route("/about")
-def about():
-    return render_template('about.html', title='About',currentUserType = currentUserType)
-
 @app.route("/faq")
 def faq():
     return render_template('faqs.html', title='FAQ',currentUserType = currentUserType)
@@ -77,34 +73,6 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
     form = LoginForm()
-    # if form.google.data:
-    #     access_token = session.get('access_token')
-    #     if access_token is None:
-    #         return redirect(url_for('googleLogin'))
-    #
-    #     access_token = access_token[0]
-    #
-    #     headers = {'Authorization': 'OAuth '+access_token}
-    #     req = Request('https://www.googleapis.com/oauth2/v1/userinfo',None, headers)
-    #     try:
-    #         res = urlopen(req)
-    #     except URLError as e:
-    #         if e.code == 401:
-    #         # Unauthorized - bad token
-    #             session.pop('access_token', None)
-    #             return redirect(url_for('googleLogin'))
-    #         res.read()
-    #
-    #     output = res.read().decode('utf-8')
-    #     json_obj = json.loads(output)
-    #     if currentUserType.isStudent():
-    #         user = Student.query.filter_by(email=json_obj['email']).first()
-    #     elif currentUserType.isTeacher():
-    #         user = Teacher.query.filter_by(email=json_obj['email']).first()
-    #     login_user(user, remember=form.remember.data)
-    #     next_page = request.args.get('next')
-    #     return redirect(next_page) if next_page else redirect(url_for('dashboard'))
-
     if form.validate_on_submit():
         if currentUserType.isStudent():
             user = Student.query.filter_by(email=form.email.data).first()
@@ -136,7 +104,6 @@ def insert():
         session["subject"] = request.args.get['subject']
 
     codd=''.join(random.choice(string.ascii_uppercase + string.ascii_uppercase + string.digits) for _ in range(8))
-    # print(session['filepath'])
     if session["filepath"][-3:] != 'pdf'  and session["filepath"][-3:] != 'txt':
         flash("Invalid file format!")
     else:
@@ -145,8 +112,7 @@ def insert():
         testt=Test(subject=session["subject"],teacher_id=current_user.id,code=codd,status=0,tot_questions=request.form['tot_questions'],tot_time = request.form['tot_time'])
         db.session.add(testt)
         db.session.commit()
-        # for ans in answer_list:
-        #     global_answers.append(ans)
+
         for (q,a,m) in zip(question_list,answer_list,mcq_list):
             if '' in m:
                 continue
@@ -181,7 +147,6 @@ def add_question():
 def up_question(id):
     i=request.form['checkboxvalue']
     k=list(map(int,i.split(',')))
-    # print(k)
     allq = Questions.query.filter_by(test_id=id).all()
     for a in allq:
         if a.id in k:
@@ -360,40 +325,6 @@ def reset_token(token):
         return redirect(url_for('login'))
     return render_template('reset_token.html', title='Reset Password', form=form,currentUserType = currentUserType)
 
-# @app.route("/generate_test", methods=["GET", "POST"])
-# def generate_test():
-#     file = request.files["file"]
-#     session["filepath"] = secure_filename(file.filename)
-#     file.save(secure_filename(file.filename))
-#
-#     if request.method=='POST':
-#         session["subject"] = request.form['subject']
-#     else:
-#         session["subject"] = request.args.get['subject']
-#
-#     codd=''.join(random.choice(string.ascii_uppercase + string.ascii_uppercase + string.digits) for _ in range(8))
-#
-#     testt=Test(subject=session["subject"],date_created=date.today(),teacher_id=current_user.id,code=codd,status=1,max_score=10)
-#     db.session.add(testt)
-#     db.session.commit()
-#
-#
-#
-#         # Generate objective test
-#     objective_generator = ObjectiveTest(session["filepath"])
-#     question_list, answer_list = objective_generator.generate_test()
-#     for ans in answer_list:
-#         global_answers.append(ans)
-#
-#     return render_template(
-#         "objective_test.html",
-#         testname=session["subject"],
-#         question1=question_list[0],
-#         question2=question_list[1],
-#         question3=question_list[2]
-#     )
-
-
 @app.route("/test/<int:testId>", methods=['POST', 'GET'])
 def test(testId):
     global global_questions
@@ -411,17 +342,14 @@ def test(testId):
         m = Marks.query.filter_by(student_id=current_user.id,test_id=testId).first()
         if m:
             return render_template("test.html", data=questions, currentUserType=currentUserType, restricted=True)
-        # print(global_questions)
         return render_template("test.html", data=questions, currentUserType=currentUserType, restricted=False, teacher=teach, subject = t.subject, duration=t.tot_time*60)
     else:
-        # questions = global_questions
         questions = session['questions'].split(' ')
         result = 0
         m = Marks(test_id=testId,student_id=current_user.id, score=result)
         db.session.add(m)
         db.session.commit()
         for q_str in questions:
-            # print(q_str)
             q = Questions.query.filter_by(id=int(q_str)).first()
             selected = str(q.id)
             try:
@@ -435,7 +363,6 @@ def test(testId):
             except Exception as e:
                 ans = Answers(marks_id=m.id,q_id=q.id,student_ans='',right_ans=False)
                 db.session.add(ans)
-                # print(e)
             m.score = result
             db.session.commit()
         return redirect(url_for("solution",testId=testId))
@@ -478,7 +405,6 @@ def solution(testId):
         temp['student_ans'] = q.student_ans
         temp['right_ans'] = q.right_ans
         questions.append(temp)
-    # random.shuffle(questions)
     return render_template('view_test.html', percentage=round(prc,2), subject=t.subject ,currentUserType=currentUserType, data=questions, teacher = teach)
 
 
@@ -490,13 +416,11 @@ def dashboard():
         my_all_marks=[x[0] for x in my_all]
         my_temp=Marks.query.filter_by(student_id=current_user.id).with_entities(Marks.test_id).all()
         my_temp_tests=[x[0] for x in my_temp]
-        # print(my_temp_tests)
         my_all_tests=[]
         for i in my_temp_tests:
             t=Test.query.filter_by(id=i).with_entities(Test.subject).all()
             temp=[x[0] for x in t]
             my_all_tests.append(temp[0])
-        # print(my_all_tests,my_all_marks)
         code_form = CodeForm()
         if code_form.validate_on_submit():
             c = code_form.code.data
@@ -548,11 +472,8 @@ def dashboard():
                     passs[i]+=1
                 else:
                     fail[i]+=1
-        # print("This is some data",passs,fail,my_subjects)
         pass_col=["green"]*len(test_ids)
         fail_col=["red"]*len(test_ids)
-        # passs=[]
-        # fail=[]
         return render_template('teacher_dash.html', title='Dashboard',currentUserType = currentUserType,rows=dat,passs=passs,fail=fail,labels=my_subjects,pass_col=pass_col,fail_col=fail_col)
 
     else:
@@ -565,15 +486,11 @@ def graph(testId):
     labels=[x[0] for x in all_studs]
     all_marks=Marks.query.filter_by(test_id=testId).with_entities(Marks.score).all()
     values=[x[0] for x in all_marks]
-    # print(labels,values)
     my_mark=Marks.query.filter_by(test_id=testId,student_id=current_user.id).with_entities(Marks.score).all()
     my_marks=[x[0] for x in my_mark]
-
     three_values=[min(values),sum(values)/len(values),max(values),my_marks[0]]
     plot_three_labels=['Minimum','Average','Maximum','Your score']
-
     leader=Marks.query.filter_by(test_id=testId).order_by(desc(Marks.score)).all()
-    # print(leader)
 
     leader_board = []
     for row in leader:
@@ -584,11 +501,9 @@ def graph(testId):
         temp['score'] = row.score
         name=Student.query.filter_by(id=row.student_id).with_entities(Student.name).first()
         s_name=name[0]
-        # print(s_name)
         temp['name']=s_name
 
         leader_board.append(temp)
-    # print(leader_board)
 
     if len(leader_board)>=3:
         fin_lead=leader_board[:3]
@@ -633,8 +548,6 @@ def teach_graph(id):
         student_list.append(temp)
     t_name=current_user.name
     pp=t_name.split(' ')
-    # print(pp)
 
     filename=subj + '_' + pp[0] + '_' + 'results.csv'
-    # print(filename)
     return render_template("teach_graph.html", title="Result",rows=student_list,filename=filename,currentUserType = currentUserType)
